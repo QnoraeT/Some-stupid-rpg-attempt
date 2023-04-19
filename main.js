@@ -1,12 +1,12 @@
+"use strict";
 var pos = []
 
 function allInQueue(){
     let attempts = 0
     for (let i = 0; i < damageList.length; ++attempts){
-        if (attempts > 100){
+        if (attempts > 10000){
             throw new Error("Hey! Something went wrong! I can't process this!")
         }
-        console.log(damageList[i])
         if (damageList[i] == "Damage"){
             people[damageList[i+2]].extraInfo[0] = damageList[i+1]
             let DMsub = 0
@@ -16,9 +16,10 @@ function allInQueue(){
             people[damageList[i+2]].health = people[damageList[i+2]].health - trueDamage
             people[damageList[i+2]].hitTimer = 0
             i = i + 5
+            console.log(format(trueDamage, 3, 10000) + " damage")
         }    
         if (damageList[i] == "Effect"){
-            let pA = damageList[i+2] // personAffected
+            let pA = damageList[i+2].name // personAffected
             let effectType = damageList[i+3]
             let duration = damageList[i+4]
             let strength = damageList[i+5]
@@ -114,7 +115,10 @@ function newMusic(m){
 
 function updateVisuals(){
     let sprite
+    let dlastHP
+    let dcurrHP
     for (let i = 0; i < peopleNames.length; ++i){
+        dcurrHP = clamp(people[peopleNames[i]].health / people[peopleNames[i]].maxHealth,0,1)
         translateXY(people[peopleNames[i]].xPosition,
             people[peopleNames[i]].yPosition, 
             people[peopleNames[i]].sizeX, 
@@ -123,6 +127,8 @@ function updateVisuals(){
         const character = document.getElementById('character' + i);
         character.style.left = pos[0] + 'px'
         character.style.top = pos[1] + 'px'
+        character.style.width = pos[2] + 'px'
+        character.style.height = pos[3] + 'px'
         // update HP bar
         translateXY(
             people[peopleNames[i]].xPosition + people[peopleNames[i]].xPosHP,
@@ -132,24 +138,24 @@ function updateVisuals(){
         hpContainer.style.top = pos[1] + 'px'
         hpContainer.style.width = pos[2] + 'px'
         hpContainer.style.height = pos[3] + 'px'
-        const hpFill3 = document.getElementById('hp' + i + 'c');
+        const hpFill3 = document.getElementById('hp' + i + 'c'); // empty
         hpFill3.style.left = pos[0] + 'px'
         hpFill3.style.top = pos[1] + 'px'
         hpFill3.style.width = pos[2] + 'px'
         hpFill3.style.height = pos[3] + 'px'
-        hpFill3.style.backgroundColor = getRainbowColour(2 * clamp(people[peopleNames[i]].health / people[peopleNames[i]].maxHealth,0,1),0.25,1)
-        const hpFill = document.getElementById('hp' + i + 'b');
+        hpFill3.style.backgroundColor = getRainbowColour(2 * dcurrHP,0.25,1)
+        const hpFill = document.getElementById('hp' + i + 'b'); // last
         hpFill.style.left = pos[0] + 'px'
         hpFill.style.top = pos[1] + 'px'
         hpFill.style.width = clamp(lastHP[i] / people[peopleNames[i]].maxHealth,0,1) * pos[2] + 'px'
         hpFill.style.height = pos[3] + 'px'
         hpFill.style.backgroundColor = getRainbowColour(1,0.9,(Math.sin(24*Time)/2)+0.5)
-        const hpFill2 = document.getElementById('hp' + i + 'a');
+        const hpFill2 = document.getElementById('hp' + i + 'a'); // fill
         hpFill2.style.left = pos[0] + 'px'
         hpFill2.style.top = pos[1] + 'px'
-        hpFill2.style.width = clamp(people[peopleNames[i]].health / people[peopleNames[i]].maxHealth,0,1) * pos[2] + 'px'
+        hpFill2.style.width = dcurrHP * pos[2] + 'px'
         hpFill2.style.height = pos[3] + 'px'
-        hpFill2.style.backgroundColor = getRainbowColour(2 * clamp(people[peopleNames[i]].health / people[peopleNames[i]].maxHealth,0,1),1,1)
+        hpFill2.style.backgroundColor = getRainbowColour(2 * dcurrHP,1,1)
 
     }
 }
@@ -158,7 +164,7 @@ function updateLastHP(){
     for (let i = 0; i < peopleNames.length; ++i){
         people[peopleNames[i]].hitTimer = people[peopleNames[i]].hitTimer + delta
         if (people[peopleNames[i]].hitTimer >= 1){
-            if (Math.abs(lastHP[i] - people[peopleNames[i]].health) > people[peopleNames[i]].maxHealth * delta * 0.25){
+            if (lastHP[i] - people[peopleNames[i]].health > people[peopleNames[i]].maxHealth * delta * 0.25){
                 lastHP[i] = lastHP[i] + people[peopleNames[i]].maxHealth * delta * 0.25 * ((lastHP[i] > people[peopleNames[i]].health) ? -1 : 1)
             } else {
                 lastHP[i] = people[peopleNames[i]].health

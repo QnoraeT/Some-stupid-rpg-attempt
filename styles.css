@@ -17,14 +17,15 @@ body {
 .fill {
   background-color: #00FF00;
   transition-duration: 0.3s;
+  z-index: 5;
 }
 
 .last {
-  position: static;
+  z-index: 4;
 }
 
 .empty {
-  position: static;
+  z-index: 3;
 }
 
 #hp0-container {
@@ -33,9 +34,8 @@ body {
 
 .character {
   position: absolute;
-  background-repeat: no-repeat;
-  background-size: contain;
   border: 1px solid black;
+  background-repeat: no-repeat;
   width: auto; 
   height: auto;
 }

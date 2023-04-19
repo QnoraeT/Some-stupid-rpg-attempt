@@ -1,3 +1,4 @@
+"use strict";
 let canvasSize = {width: 0, height: 0}
 
 window.addEventListener('resize', resize);
