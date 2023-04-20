@@ -124,10 +124,9 @@ function updateVisuals(){
         dlastHP = clamp(lastHP[i] / people[peopleNames[i]].maxHealth,0,1);
         translateXY(people[peopleNames[i]].xPosition,
             people[peopleNames[i]].yPosition, 
-            people[peopleNames[i]].sizeX, 
-            people[peopleNames[i]].sizeY
+            people[peopleNames[i]].size, 
             );
-        changeAtt('character' + i, pos[0], pos[1], pos[2], pos[3], "", "characters/Alterian Skyler/assets/" + people[peopleNames[i]].spriteState + ".svg")
+        changeAtt('character' + i, pos[0], pos[1], "", "", "", "characters/Alterian Skyler/assets/" + people[peopleNames[i]].spriteState + ".svg")
         // update HP bar
         translateXY(
             people[peopleNames[i]].xPosition + people[peopleNames[i]].xPosHP,

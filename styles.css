@@ -30,8 +30,5 @@ body {
 
 .character {
   position: absolute;
-  border: 1px solid black;
-  background-repeat: no-repeat;
-  width: auto; 
-  height: auto;
+  transform: translate(-50%, -50%)
 }
