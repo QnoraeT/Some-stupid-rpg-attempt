@@ -3,7 +3,7 @@ body {
 }
 
 .bar-container {
-  position: relative;
+  position: absolute;
 }
 
 .bar {
@@ -28,19 +28,10 @@ body {
   z-index: 3;
 }
 
-#hp0-container {
-  position: absolute;
-}
-
 .character {
   position: absolute;
   border: 1px solid black;
   background-repeat: no-repeat;
   width: auto; 
   height: auto;
-}
-
-.character0 {
-  background-image: url('characters/Alterian\ Skyler/assets/Idle1.svg');
-  /* other styling properties */
 }
