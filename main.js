@@ -1,5 +1,9 @@
 "use strict";
-var pos = [];
+let pos = [];
+
+function rand(min, max){
+    return Math.random()*(max-min)+min
+}
 
 function allInQueue(){
     let attempts = 0;
@@ -9,19 +13,64 @@ function allInQueue(){
         }
         if (damageList[i] == "Damage"){
             people[damageList[i+2]].extraInfo[0] = damageList[i+1];
+            let damage = Math.random()*100
+            let crit = false
+            for (let j = damageList[i+4].length - 1; j >= 0; --j){
+                if (damage < damageList[i+4][j]){
+                    damage = j;
+                    crit = true;
+                    break;
+                }
+            }
+            if (crit == true){
+                console.log(critNames[damage] + " Hit!");
+                damage = damageList[i+3] * damageList[i+5][damage];
+            } else {
+                damage = damageList[i+3]
+            }
+            damage = damage * rand(1/((damageList[i+6]/100)+1),((damageList[i+6]/100)+1))
             let DMsub = 0;
-            DMsub += people[damageList[i+2]].trueDef
+            if (damageList[i+8] == false) {DMsub += people[damageList[i+2]].trueDef;}
             let DMdiv = 1;
             let DMpow = 1;
-            let trueDamage = (Math.max((damageList[i+3] - DMsub), 0) ** DMpow) / DMdiv;
+            let trueDamage = (Math.max((damage - DMsub), 0) ** DMpow) / DMdiv;
             people[damageList[i+2]].health = people[damageList[i+2]].health - trueDamage;
             people[damageList[i+2]].hitTimer = 0;
             if (people[damageList[i+2]].health <= 0) console.log("Mortal! [" + format(-1 * people[damageList[i+2]].health, 3, 1000000) + "] HP overkill");
             console.log(format(trueDamage, 3, 1000000) + " damage");
-            i = i + 5;
+            i = i + 9;
+        }    
+        //damageList.push("Heal", this.name, person, healing, variance, type);
+        if (damageList[i] == "Heal"){
+            for (let j = damageList[i+3].length - 1; j >= 0; --j){
+                let healing = damageList[i+3][j] * rand(1/((damageList[i+4]/100)+1),((damageList[i+4]/100)+1))
+                console.log(format(healing, 3, 1000000) + " healing");
+                switch(j){
+                    case 0: 
+                        people[damageList[i+2]].health = people[damageList[i+2]].health + healing;
+                        break;
+                    case 1: 
+                        people[damageList[i+2]].mana = people[damageList[i+2]].mana + healing;
+                        break;
+                    case 2: 
+                        people[damageList[i+2]].SuperPower = people[damageList[i+2]].SuperPower + healing;
+                        break;
+                    case 3: 
+                        people[damageList[i+2]].GigaPower = people[damageList[i+2]].GigaPower + healing;
+                        break;
+                    case 4: 
+                        people[damageList[i+2]].HyperPower = people[damageList[i+2]].HyperPower + healing;
+                        break;
+                    default:
+                        console.warn("You can't heal what you don't know! [" + j + " >= 5]");
+                        j = 5;
+                        break;
+                }
+            }
+            i = i + 6;
         }    
         if (damageList[i] == "Effect"){
-            let pA = damageList[i+2].name; // personAffected
+            let pA = damageList[i+2]; // personAffected
             let effectType = damageList[i+3];
             let duration = damageList[i+4];
             let strength = damageList[i+5];
@@ -38,17 +87,17 @@ function allInQueue(){
                             console.log("effect strength increased");
                         }
                         console.log("effect stats checked");
-                        break
+                        break;
                     case 1: 
                         people[pA].sDuration[id] = duration;
                         people[pA].sStrength[id] = strength;
                         console.log("effect stats overwritten");
-                        break
+                        break;
                     case 2:
                         console.log("already has one. nothing changed");
-                        break
+                        break;
                     default:
-                        throw new Error("What do you want me to do here?? " + people[pA].name + " already has the effect " + effectList[effectType]);
+                        throw new Error("What do you want me to do here?? " + people[pA].name + " already has the effect " + effectList[effectType]) + ", but you are not clear what you want me to do! (Type: " + damageList[i+6] + ")";
                 }
             } else {
                 people[pA].sEffects.push(effectType);
@@ -117,24 +166,30 @@ function newMusic(m){
 }
 
 function updateVisuals(){
+    if (Zoom <= 0){Zoom = 1; throw new Error("Hey WTF! Who set the zoom to 0!? {System stopped.}")}
     let dlastHP;
     let dcurrHP;
     for (let i = 0; i < 1; ++i){
         dcurrHP = clamp(people[peopleNames[i]].health / people[peopleNames[i]].maxHealth,0,1);
         dlastHP = clamp(lastHP[i] / people[peopleNames[i]].maxHealth,0,1);
-        translateXY(people[peopleNames[i]].xPosition,
+        let [left, top, width, height] = translateXY(people[peopleNames[i]].xPosition,
             people[peopleNames[i]].yPosition, 
-            people[peopleNames[i]].size, 
+            people[peopleNames[i]].sizeX * people[peopleNames[i]].size, 
+            people[peopleNames[i]].sizeY * people[peopleNames[i]].size
             );
-        changeAtt('character' + i, pos[0], pos[1], "", "", "", "characters/Alterian Skyler/assets/" + people[peopleNames[i]].spriteState + ".svg")
-        // update HP bar
-        translateXY(
-            people[peopleNames[i]].xPosition + people[peopleNames[i]].xPosHP,
-            people[peopleNames[i]].yPosition + people[peopleNames[i]].yPosHP, people[peopleNames[i]].sizeX * people[peopleNames[i]].sHP, 8 * people[peopleNames[i]].sHP)
-        changeAtt('hp' + i + '-container', pos[0], pos[1], dcurrHP * pos[2], pos[3])
-        changeAtt('hp' + i + 'c', pos[0], pos[1], pos[2], pos[3], gRC(2 * dcurrHP, 0.25, 1))
-        changeAtt('hp' + i + 'b', pos[0], pos[1], dlastHP * pos[2], pos[3], gRC(1, 0.9, (Math.sin(24 * Time) / 2) + 0.5))
-        changeAtt('hp' + i + 'a', pos[0], pos[1], dcurrHP * pos[2], pos[3], gRC(2 * dcurrHP, 1, 1))
+        changeAtt('character' + i, left, top, width, height, "", "characters/" + peopleNames[i] + "/assets/" + people[peopleNames[i]].spriteState + ".svg");
+        // update HP bars
+        [left, top, width, height] = translateXY(people[peopleNames[i]].xPosition + people[peopleNames[i]].xPosHP * people[peopleNames[i]].size,
+            people[peopleNames[i]].yPosition + people[peopleNames[i]].yPosHP * people[peopleNames[i]].size, 
+            people[peopleNames[i]].sizeX * people[peopleNames[i]].sHP * people[peopleNames[i]].size, 
+            8 * people[peopleNames[i]].sHP * people[peopleNames[i]].size
+            );
+        changeAtt('hp' + i + '-container', left, top, width, height);
+        changeAtt('hp' + i + 'c', left, top, width, height, gRC(2 * dcurrHP, 0.25, 1));
+        changeAtt('hp' + i + 'b', left, top, dlastHP * width, height, gRC(1, 0.9, (Math.sin(24 * Time) / 2) + 0.5));
+        changeAtt('hp' + i + 'a', left, top, dcurrHP * width, height, gRC(2 * dcurrHP, 1, 1));
+        const hpContainer = document.getElementById('hp' + i + '-container')
+        hpContainer.style.border = height / 2 + "px solid #181818"
     }
 }
 
@@ -194,7 +249,7 @@ function gRC(time, val, sat){
             r = 1;
             break;
         default:
-            throw new Error("Unexpected value!!");
+            throw new Error("Wtf!! Why is there an invalid number?  [" + s + "]");
     }
     r = 1 - ((1 - r) * sat);
     g = 1 - ((1 - g) * sat);
@@ -215,11 +270,12 @@ function pad(num,length){
 }
 
 function translateXY(x,y,xs,ys){
-    pos = []
-    pos.push((canvasSize.width / 2) + ((x - CamX + ShakeX) / Zoom))
-    pos.push((canvasSize.height / 2) + ((-y - CamY + ShakeY) / Zoom))
-    pos.push(xs / Zoom)
-    pos.push(ys / Zoom)
+    return [
+        (canvasSize.width / 2) + ((x - CamX + ShakeX) / Zoom),
+        (canvasSize.height / 2) + ((-y - CamY + ShakeY) / Zoom),
+        xs / Zoom,
+        ys / Zoom,
+    ];
 }
 
 {
