@@ -106,17 +106,45 @@ class Character {
         this.HyperPower = 0;
         this.HyperPowerMax = 100;
         this.hitTimer = 1;
+        this.trueDDef = 1;
+        this.truePDef = 1;
         lastHP.push(this.health);
         peopleNames.push(this.name);
     }
 
     updateSTATEffects(){
+        // ["Burn", "Poison", "Sunstroke", "Paralyze", "Sleep", "Freeze", "Confusion", "Strange", "Crying",
+        // "Ichor", "Ironskin", "Light Shield", "Revitalize", "Energize", "Dazed", "Focus", "Taunt", "Slow"
+        // "Fast", "Unstable Magic", "Bad Poison", "Silence", "Strong", "Weak"];
         let mod;
         mod = 1;
+        if (this.sEffects.includes(16)) mod *= 1.667
+        if (this.sEffects.includes(21)) mod *= 1.75
+        if (this.sEffects.includes(22)) mod *= 0.6
         this.trueAtk = this.atk * mod;
         mod = 1;
+        if (this.sEffects.includes(9)) mod *= 0.6
+        if (this.sEffects.includes(10)) mod *= 1.333
+        if (this.sEffects.includes(16)) mod /= 1.667
         this.trueDef = this.def * mod;
-        mod = (Math.random() * 0.5) + 0.75;
+        mod = 1;
+        if (this.sEffects.includes(9)) mod *= 0.75
+        if (this.sEffects.includes(10)) mod *= 1.5
+        if (this.sEffects.includes(11)) mod *= 1.667
+        if (this.sEffects.includes(16)) mod *= 0.8
+        this.trueDDef = mod;
+        mod = 1;
+        this.truePDef = mod;
+        mod = rand(0.8, 1.2);
+        if (this.sEffects.includes(3)) mod *= 0.7
+        if (this.sEffects.includes(4)) mod *= 0.1
+        if (this.sEffects.includes(5)) mod *= 0.1
+        if (this.sEffects.includes(6)) mod *= 0.7
+        if (this.sEffects.includes(14)) mod *= 0.5
+        if (this.sEffects.includes(15)) mod *= 1.5
+        if (this.sEffects.includes(17)) mod *= 0.667
+        if (this.sEffects.includes(18)) mod *= 1.5
+        if (this.sEffects.includes(20)) mod *= 0.5
         this.trueSpd = this.spd * mod;
     }
 
@@ -127,31 +155,31 @@ class Character {
             attempts++
             switch(this.sEffects[i]){
                 case 0: 
-                    this.damage(this.name, this.sStrength[i], [0], [1], 10, "Fire", true); 
+                    this.damage(this.name, this.sStrength[i], [0], [1], 10, ["Fire", "Physical"], 1); 
                     allInQueue();
                     break;
                 case 1: 
-                    this.damage(this.name, this.sStrength[i], [0], [1], 10, "Poison", true); 
+                    this.damage(this.name, this.sStrength[i], [0], [1], 10, ["Poison", "Physical"], 1); 
                     allInQueue();
                     break;
                 case 2: 
-                    this.damage(this.name, this.sStrength[i], [0], [1], 10, "Normal", true); 
+                    this.damage(this.name, this.sStrength[i], [0], [1], 10, ["Normal", "Physical"], 1); 
                     allInQueue();
                     break;
                 case 12: 
-                    this.heal(this.name, [this.sStrength[i]], 10, "Normal"); 
+                    this.heal(this.name, [this.sStrength[i]], 10, ["Normal", "Physical"]); 
                     allInQueue();
                     break;
                 case 13: 
-                    this.heal(this.name, [0, this.sStrength[i]], 10, "Normal"); 
+                    this.heal(this.name, [0, this.sStrength[i]], 10, ["Normal", "Physical"]); 
                     allInQueue();
                     break;
                 case 19: 
-                    this.damage(this.name, this.sStrength[i], [0], [1], 10, "Magic", true); 
+                    this.damage(this.name, this.sStrength[i], [0], [1], 10, ["Magic", "Magical"], 2); // this causes an unstable magic buff on it's own effect. leave it in as a quirk?
                     allInQueue();
                     break;
                 case 20: 
-                    this.damage(this.name, this.sStrength[i]*this.sDuration[i], [0], [1], 10, "Poison", true); 
+                    this.damage(this.name, this.sStrength[i]*this.sDuration[i], [0], [1], 10, ["Poison", "Physical"], 1); 
                     // this works differently than in pokemon!
                     // this damage decays over time instead of increasing, but is still much stronger than the normal poison variant
                     allInQueue();

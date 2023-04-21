@@ -15,7 +15,7 @@ function allInQueue(){
             people[damageList[i+2]].extraInfo[0] = damageList[i+1];
             let damage = Math.random()*100
             let crit = false
-            for (let j = damageList[i+4].length - 1; j >= 0; --j){
+            for (let j = damageList[i+4].length - 1; j >= 0; --j){ // critical hit checker
                 if (damage < damageList[i+4][j]){
                     damage = j;
                     crit = true;
@@ -26,14 +26,17 @@ function allInQueue(){
                 console.log(critNames[damage] + " Hit!");
                 damage = damageList[i+3] * damageList[i+5][damage];
             } else {
-                damage = damageList[i+3]
+                damage = damageList[i+3];
             }
-            damage = damage * rand(1/((damageList[i+6]/100)+1),((damageList[i+6]/100)+1))
+            damage = damage * rand(1/((damageList[i+6]/100)+1),((damageList[i+6]/100)+1));
+            if (people[damageList[i+1]].sEffects.includes(19) && damageList[i+7].includes("Magical")){damage = damage * 2.5; console.log("Unstable Magic buff!")};
             let DMsub = 0;
-            if (damageList[i+8] == false) {DMsub += people[damageList[i+2]].trueDef;}
+            if (damageList[i+8] < 1) {DMsub += people[damageList[i+2]].trueDef;};
             let DMdiv = 1;
+            if (damageList[i+8] < 2) {DMdiv *= people[damageList[i+2]].trueDDef;};
             let DMpow = 1;
-            let trueDamage = (Math.max((damage - DMsub), 0) ** DMpow) / DMdiv;
+            if (damageList[i+8] < 3) {DMpow *= people[damageList[i+2]].truePDef;};
+            let trueDamage = Math.max((((damage ** DMpow) / DMdiv) - DMsub), 0);
             people[damageList[i+2]].health = people[damageList[i+2]].health - trueDamage;
             people[damageList[i+2]].hitTimer = 0;
             if (people[damageList[i+2]].health <= 0) console.log("Mortal! [" + format(-1 * people[damageList[i+2]].health, 3, 1000000) + "] HP overkill");
@@ -159,7 +162,6 @@ function newMusic(m){
         throw new Error('Hey! That song is out of bounds! ' + m);
     }
     for (let i = 0; i < music.length; ++i){
-        console.log(i)
         music[i].load();
     }
     music[m].play();
