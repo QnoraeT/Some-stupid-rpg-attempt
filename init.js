@@ -34,7 +34,8 @@ let musicVolume = 1.00;
 let sfxVolume = 0.30;
 const effectList = ["Burn", "Poison", "Sunstroke", "Paralyze", "Sleep", "Freeze", "Confusion", "Strange", "Crying", "Ichor", "Ironskin", "Light Shield", "Revitalize", "Energize", "Dazed", "Focus", "Taunt", "Slow", "Fast", "Unstable Magic", "Bad Poison", "Silence", "Strong", "Weak"];
 const music = [new Audio('music/forget not (shortened).mp3'), new Audio('music/something with danidanijr V3.6 NO ARTS.mp3')];
-const critNames = ["Critical", "Deadly", "Super", "Ultra", "Hyper", "EXTREME", "ULTIMATE"]
+const critNames = ["Critical", "Deadly", "Super", "Ultra", "Hyper", "EXTREME", "ULTIMATE"];
+const elementList = ["Normal", "Water", "Fire", "Grass", "Electric", "Ice", "Air", "Dark", "Light", "Earth", "Fighting", "Poison", "Insect", "Rock", "Metal", "Spirit", "Psychic", "Dragon", "Mystic", "Sound", "Crystal", "Mech", "Time", "Chemical", "Explosive", "Magic", "Plasma", "Volcanic", "Glass", "Virus", "Cyber", "Celestial", "Cosmic", "Magnetic", "Spectra", "Wood", "Soul", "Shadow", "Nuclear", "Ancient"]
 /*const comboSound = [];
 
 for (let i = 1; i <= 16; ++i){

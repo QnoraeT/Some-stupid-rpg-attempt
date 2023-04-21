@@ -5,6 +5,10 @@ function rand(min, max){
     return Math.random()*(max-min)+min
 }
 
+function checkElementEffective(){
+
+}
+
 function allInQueue(){
     let attempts = 0;
     for (let i = 0; i < damageList.length; ++attempts){
@@ -30,6 +34,7 @@ function allInQueue(){
             }
             damage = damage * rand(1/((damageList[i+6]/100)+1),((damageList[i+6]/100)+1));
             if (people[damageList[i+1]].sEffects.includes(19) && damageList[i+7].includes("Magical")){damage = damage * 2.5; console.log("Unstable Magic buff!")};
+            if (people[damageList[i+1]].sEffects.includes(21) && damageList[i+7].includes("Magical")){damage = damage * 0.25; console.log("Silenced nerf!")};
             let DMsub = 0;
             if (damageList[i+8] < 1) {DMsub += people[damageList[i+2]].trueDef;};
             let DMdiv = 1;
