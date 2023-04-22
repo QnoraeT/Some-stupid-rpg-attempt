@@ -5,8 +5,49 @@ function rand(min, max){
     return Math.random()*(max-min)+min
 }
 
-function checkElementEffective(){
+function checkElementEffective(attacking, d){
+    // i'm gonna have to leave this tomorrow, i'm not sure if it's possible to generalize this at all...
+    let mul = 1;
+    for (let i = 0; i < attacking.length; ++i){
+        switch(attacking[i]){
+        case "Normal": 
+            mul *= damageElementCheck(0.5, d, ["Rock", "Metal", "Crystal", "Mech", "Chemical", "Volcanic", "Virus"]);
+            mul *= damageElementCheck(0, d, ["Spirit", "Soul"]);
+            break;
+        case "Water": 
+            mul *= damageElementCheck(2, d, ["Fire", "Earth", "Rock", "Volcanic", "Cyber", "Magnetic", "Spectra"]);
+            mul *= damageElementCheck(0.5, d, ["Water", "Grass", "Air", "Dragon", "Chemical", "Plasma", "Glass", "Celestial", "Wood", "Nuclear", "Ancient"]);
+            break;
+        case "Fire": 
+            mul *= damageElementCheck(0, d, ["Crystal"]);
+            break;
+        case "Grass": 
 
+            break;
+        case "Electric": 
+
+            break;
+        default:
+            console.log("unknown element: " + attacking[i]);
+            break;
+        }
+    }
+    return mul;
+}
+
+function damageElementCheck(multiplier, def, check){
+    let at2 = 0;
+    for (let i = 0; i < check.length; ++i){
+        at2++;
+        if (check.includes(def[i])){
+            console.log("match!");
+            return multiplier;
+        }
+        if (at2 > 10000){
+            throw new Error("Hey! Something went wrong! I can't process this!");
+        }
+    }
+    return 1;
 }
 
 function allInQueue(){

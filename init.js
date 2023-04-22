@@ -64,7 +64,7 @@ for (let i = 0; i < music.length; ++i){
 }
 
 class Character {
-    constructor(name, lvl, XPos, YPos, size, XOffsetHP, YOffsetHP, SizeOffsetHP, baseXPReq, xp, baseHP, baseMP, elem1, elem2, baseATK, baseDEF, baseSPD, hpType, personType, team, sizeX, sizeY){
+    constructor(name, lvl, XPos, YPos, size, XOffsetHP, YOffsetHP, SizeOffsetHP, baseXPReq, xp, baseHP, baseMP, elem, baseATK, baseDEF, baseSPD, hpType, personType, team, sizeX, sizeY){
         this.name = name;
         let lf = lvl - 1;
         lf = (((lf + ((lf ** 2) / 15) + ((lf ** 3) / 120)) ** (1 + (lf / 250))) + 8) / 8;
@@ -88,8 +88,7 @@ class Character {
         this.trueDef = this.def;
         this.trueSpd = this.spd;
         this.HPtype = hpType;
-        this.type1 = elem1;
-        this.type2 = elem2;
+        this.type = elem;
         this.status = personType;
         this.team = team;
         this.target = "";
@@ -230,11 +229,11 @@ class Character {
 }
 
 let people = {
-    "Alterian Skyler": new Character("Alterian Skyler", 1, 0, 0, 1, -67.5, 160, 1, 45, 0, 47, 11, "Normal", "Electric", 7, 2.3, 16, "Normal", "PlayerBoss", 0, 128, 256),
+    "Alterian Skyler": new Character("Alterian Skyler", 1, 0, 0, 1, -67.5, 160, 1, 45, 0, 47, 11, ["Normal", "Electric"], 7, 2.3, 16, "Normal", "PlayerBoss", 0, 128, 256),
     //"Alterian Skyler": new Character("Alterian Skyler", 89, 0, 100, 1, -16.5, 20, 1, 45, 0, 150, 15, "Normal", "Electric", 10, 2, 16, "Normal", "PlayerBoss", 0, 128, 256),
-    "ToWM:TowerSB": new Character("ToWM:TowerSB", 70, -50, -50, 1, 0, 40, 1, 35, 0, 55, 10, "Normal", "", 25, 10, 16, "Normal", "Player", 1, 128, 256),
-    "ToFUN:TowerSB": new Character("ToFUN:TowerSB", 70, -30, -50, 1, 0, 40, 1, 40, 0, 50, 16, "Normal", "", 40, 20, 10, "Normal", "Player", 1, 128, 256),
-    "Delet Ball": new Character("Delet Ball", 1, 50, -50, 1, 0, 25, 1, 1e7, 0, 172554, 19886, "Dark", "", 27446, 10965, 31, "Normal", "Boss", 2, 256, 256)
+    "ToWM:TowerSB": new Character("ToWM:TowerSB", 70, -50, -50, 1, 0, 40, 1, 35, 0, 55, 10, ["Normal"], 25, 10, 16, "Normal", "Player", 1, 128, 256),
+    "ToFUN:TowerSB": new Character("ToFUN:TowerSB", 70, -30, -50, 1, 0, 40, 1, 40, 0, 50, 16, ["Normal"], 40, 20, 10, "Normal", "Player", 1, 128, 256),
+    "Delet Ball": new Character("Delet Ball", 1, 50, -50, 1, 0, 25, 1, 1e7, 0, 172554, 19886, ["Dark"], 27446, 10965, 31, "Normal", "Boss", 2, 256, 256)
 }
 
 for (let i = 0; i < music.length; ++i){
