@@ -214,7 +214,7 @@ function newMusic(m){
 }
 
 function updateVisuals(){
-    if (Zoom <= 0){Zoom = 1; throw new Error("Hey WTF! Who set the zoom to 0!? {System stopped.}")}
+    if (Zoom <= 0){Zoom = 1; console.error("Hey WTF! Who set the zoom to 0!?")}
     let dlastHP;
     let dcurrHP;
     for (let i = 0; i < 1; ++i){
@@ -353,6 +353,7 @@ function start(){
 }
 
 function getTurnOrder(){
+    // this is still not done
     for (let i = 0; i < peopleNames.length; ++i){
         turnOrder.push(people[peopleNames[i]].trueSpd)
     }
