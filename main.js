@@ -411,10 +411,10 @@ function updateVisuals(){
         dlastHP = clamp(lastHP[i] / people[peopleNames[i]].maxHealth,0,1);
         let [left, top, width, height] = translateXY(people[peopleNames[i]].xPosition,
             people[peopleNames[i]].yPosition, 
-            people[peopleNames[i]].sizeX * people[peopleNames[i]].size, 
-            people[peopleNames[i]].sizeY * people[peopleNames[i]].size
+            people[peopleNames[i]].size, 0
             );
         changeAtt(characters[i], left, top, "", "", "", "characters/" + peopleNames[i] + "/assets/" + people[peopleNames[i]].spriteState + ".svg");
+        characters[i].style.transform = "translate(-50%, -50%) scale(" + width + ")";
         // update HP bars
         [left, top, width, height] = translateXY(people[peopleNames[i]].xPosition + people[peopleNames[i]].xPosHP * people[peopleNames[i]].size,
             people[peopleNames[i]].yPosition + people[peopleNames[i]].yPosHP * people[peopleNames[i]].size, 
