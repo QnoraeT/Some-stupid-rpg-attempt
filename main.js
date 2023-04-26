@@ -406,7 +406,7 @@ function updateVisuals(){
     if (Zoom <= 0){Zoom = 1; console.error("Hey WTF! Who set the zoom to 0!?")}
     let dlastHP;
     let dcurrHP;
-    for (let i = 0; i < 1; ++i){
+    for (let i = 0; i < peopleNames.length; ++i){
         dcurrHP = clamp(people[peopleNames[i]].health / people[peopleNames[i]].maxHealth,0,1);
         dlastHP = clamp(lastHP[i] / people[peopleNames[i]].maxHealth,0,1);
         let [left, top, width, height] = translateXY(people[peopleNames[i]].xPosition,
@@ -414,24 +414,23 @@ function updateVisuals(){
             people[peopleNames[i]].sizeX * people[peopleNames[i]].size, 
             people[peopleNames[i]].sizeY * people[peopleNames[i]].size
             );
-        changeAtt('character' + i, left, top, width, height, "", "characters/" + peopleNames[i] + "/assets/" + people[peopleNames[i]].spriteState + ".svg");
+        changeAtt(characters[i], left, top, "", "", "", "characters/" + peopleNames[i] + "/assets/" + people[peopleNames[i]].spriteState + ".svg");
         // update HP bars
         [left, top, width, height] = translateXY(people[peopleNames[i]].xPosition + people[peopleNames[i]].xPosHP * people[peopleNames[i]].size,
             people[peopleNames[i]].yPosition + people[peopleNames[i]].yPosHP * people[peopleNames[i]].size, 
             people[peopleNames[i]].sizeX * people[peopleNames[i]].sHP * people[peopleNames[i]].size, 
             8 * people[peopleNames[i]].sHP * people[peopleNames[i]].size
             );
-        changeAtt('hp' + i + '-container', left, top, width, height);
-        changeAtt('hp' + i + 'c', left, top, width, height, gRC(2 * dcurrHP, 0.25, 1));
-        changeAtt('hp' + i + 'b', left, top, dlastHP * width, height, gRC(1, 0.9, (Math.sin(24 * Time) / 2) + 0.5));
-        changeAtt('hp' + i + 'a', left, top, dcurrHP * width, height, gRC(2 * dcurrHP, 1, 1));
-        const hpContainer = document.getElementById('hp' + i + '-container')
-        hpContainer.style.border = height / 2 + "px solid #181818"
+        changeAtt(hpBarZ[i], left, top, width, height);
+        changeAtt(hpBarC[i], left, top, width, height, gRC(2 * dcurrHP, 0.25, 1));
+        changeAtt(hpBarB[i], left, top, dlastHP * width, height, gRC(1, 0.9, (Math.sin(24 * Time) / 2) + 0.5));
+        changeAtt(hpBarA[i], left, top, dcurrHP * width, height, gRC(2 * dcurrHP, 1, 1));
+        hpBarZ[i].style.border = height / 2 + "px solid #181818"
     }
 }
 
 function changeAtt(spriteID, left, top, width, height, bgColor, src){
-    const sprite = document.getElementById(spriteID)
+    const sprite = spriteID
     if (!(left === "" || left === undefined)) sprite.style.left = left + 'px';
     if (!(top === "" || top === undefined)) sprite.style.top = top + 'px';
     if (!(width === "" || width === undefined)) sprite.style.width = width + 'px';
@@ -520,6 +519,7 @@ function translateXY(x,y,xs,ys){
     let oldTimeStamp = 0; 
 
     function gameLoop(timeStamp){
+        if (done === false) return
         delta = ((timeStamp - oldTimeStamp) / 1000) * TimeSpeed
         const FPS = Math.round(TimeSpeed / delta)
         Time = Time + delta

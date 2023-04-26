@@ -33,6 +33,7 @@ let damageIndicatorList = [];
 let musicVolume = 1.00;
 let sfxVolume = 0.30;
 let typeVerify = true; // checks if any of the elements in the type effectiveness calculator is correct
+let done = false
 const effectList = ["Burn", "Poison", "Sunstroke", "Paralyze", "Sleep", "Freeze", "Confusion", "Strange", "Crying", "Ichor", "Ironskin", "Light Shield", "Revitalize", "Energize", "Dazed", "Focus", "Taunt", "Slow", "Fast", "Unstable Magic", "Bad Poison", "Silence", "Strong", "Weak"];
 const music = [new Audio('music/forget not (shortened).mp3'), new Audio('music/something with danidanijr V3.6 NO ARTS.mp3')];
 const critNames = ["Critical", "Deadly", "Super", "Ultra", "Hyper", "EXTREME", "ULTIMATE", "HOLY"];
@@ -109,6 +110,10 @@ class Character {
         this.hitTimer = 1;
         this.trueDDef = 1;
         this.truePDef = 1;
+        this.brightness = 0.50; // 0.00 = fully black, 1.00 = fully white, multiplicative
+        this.transparency = 1.00; // 0.00 = invisible, 1.00 = visible
+        this.hueChange = 0; // 0 = FF0000 (assuming default), 1 = FFFF00, 2 = 00FF00, etc
+        this.direction = 90; //angle 90 = right, 0 = up, -90 = left, -180/180 = down
         lastHP.push(this.health);
         peopleNames.push(this.name);
     }
@@ -229,16 +234,69 @@ class Character {
     }
 }
 
-let people = {
-    "Alterian Skyler": new Character("Alterian Skyler", 1, 0, 0, 1, -67.5, 160, 1, 45, 0, 47, 11, ["Normal", "Electric"], 7, 2.3, 16, "Normal", "PlayerBoss", 0, 128, 256),
-    //"Alterian Skyler": new Character("Alterian Skyler", 89, 0, 100, 1, -16.5, 20, 1, 45, 0, 150, 15, "Normal", "Electric", 10, 2, 16, "Normal", "PlayerBoss", 0, 128, 256),
-    "ToWM:TowerSB": new Character("ToWM:TowerSB", 70, -50, -50, 1, 0, 40, 1, 35, 0, 55, 10, ["Normal"], 25, 10, 16, "Normal", "Player", 1, 128, 256),
-    "ToFUN:TowerSB": new Character("ToFUN:TowerSB", 70, -30, -50, 1, 0, 40, 1, 40, 0, 50, 16, ["Normal"], 40, 20, 10, "Normal", "Player", 1, 128, 256),
-    "Delet Ball": new Character("Delet Ball", 1, 50, -50, 1, 0, 25, 1, 1e7, 0, 172554, 19886, ["Dark"], 27446, 10965, 31, "Normal", "Boss", 2, 256, 256)
-}
+
 
 for (let i = 0; i < music.length; ++i){
     music[i].load();
 }
 
+/*                
+        <img class="character character0" id="character0">
+            <div class="bar-container bar" id="hp0-container">
+                <div class="empty" id="hp0c"></div>
+                <div class="last" id="hp0b"></div>
+                <div class="fill" id="hp0a"></div>
+            </div>
+        </img>
+*/
+
+let people = {
+    "Alterian Skyler": new Character("Alterian Skyler", 1, 0, 0, 1, -67.5, 160, 1, 45, 0, 47, 11, ["Normal", "Electric"], 7, 2.3, 16, "Normal", "PlayerBoss", 0, 128, 256),
+    //"Alterian Skyler": new Character("Alterian Skyler", 89, 0, 100, 1, -16.5, 20, 1, 45, 0, 150, 15, "Normal", "Electric", 10, 2, 16, "Normal", "PlayerBoss", 0, 128, 256),
+    //"ToWM TowerSB": new Character("ToWM TowerSB", 70, -50, -50, 1, 0, 40, 1, 35, 0, 55, 10, ["Normal"], 25, 10, 16, "Normal", "Player", 1, 128, 256),
+    //"ToFUN TowerSB": new Character("ToFUN TowerSB", 70, -30, -50, 1, 0, 40, 1, 40, 0, 50, 16, ["Normal"], 40, 20, 10, "Normal", "Player", 1, 128, 256),
+    //"Delet Ball": new Character("Delet Ball", 1, 50, -50, 1, 0, 25, 1, 1e7, 0, 172554, 19886, ["Dark"], 27446, 10965, 31, "Normal", "Boss", 2, 256, 256)
+}
+
+let characters = [];
+let hpBarZ = [];
+let hpBarA = [];
+let hpBarB = [];
+let hpBarC = [];
+for (let i = 0; i < peopleNames.length; i++){
+    let name = "character" + i
+    const char = document.createElement("img");
+    const MAIN = document.getElementById("characters")
+    char.id = name;
+    MAIN.appendChild(char);
+    document.getElementById(name).classList.add("character" + i)
+    document.getElementById(name).classList.add("character")
+    characters.push(document.getElementById(name))
+    const hpCon = document.createElement("div")
+    name = "hp" + i + "-container"
+    hpCon.id = name;
+    char.appendChild(hpCon);
+    document.getElementById(name).classList.add("bar-container")
+    document.getElementById(name).classList.add("bar")
+    hpBarZ.push(document.getElementById(name))
+    const hpC = document.createElement("div")
+    name = "hp" + i + "c"
+    hpC.id = name;
+    hpCon.appendChild(hpC);
+    document.getElementById(name).classList.add("empty")
+    hpBarC.push(document.getElementById(name))
+    const hpB = document.createElement("div")
+    name = "hp" + i + "b"
+    hpB.id = name;
+    hpCon.appendChild(hpB);
+    document.getElementById(name).classList.add("last")
+    hpBarB.push(document.getElementById(name))
+    const hpA = document.createElement("div")
+    name = "hp" + i + "a"
+    hpA.id = name;
+    hpCon.appendChild(hpA);
+    document.getElementById(name).classList.add("fill")
+    hpBarA.push(document.getElementById(name))
+}
+done = true
 resize();
