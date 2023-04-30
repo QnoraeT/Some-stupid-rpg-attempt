@@ -403,7 +403,7 @@ function newMusic(m){
 }
 
 function updateVisuals(){
-    if (Zoom <= 0){Zoom = 1; console.error("Hey WTF! Who set the zoom to 0!?")}
+    if (Zoom <= 0){console.error("Hey WTF! Who set the zoom to " + Zoom + "!?"); Zoom = 1;}
     let dlastHP;
     let dcurrHP;
     for (let i = 0; i < peopleNames.length; ++i){
@@ -422,10 +422,20 @@ function updateVisuals(){
             8 * people[peopleNames[i]].sHP * people[peopleNames[i]].size
             );
         changeAtt(hpBarZ[i], left, top, width, height);
-        changeAtt(hpBarC[i], left, top, width, height, gRC(2 * dcurrHP, 0.25, 1));
-        changeAtt(hpBarB[i], left, top, dlastHP * width, height, gRC(1, 0.9, (Math.sin(24 * Time) / 2) + 0.5));
-        changeAtt(hpBarA[i], left, top, dcurrHP * width, height, gRC(2 * dcurrHP, 1, 1));
-        hpBarZ[i].style.border = height / 2 + "px solid #181818"
+        changeAtt(hpBarC[i], "", "", width, height, gRC(2 * dcurrHP, 0.25, 1));
+        changeAtt(hpBarB[i], "", "", dlastHP * width, height, gRC(1, 0.9, (Math.sin(24 * Time) / 2) + 0.5));
+        changeAtt(hpBarA[i], "", "", dcurrHP * width, height, gRC(2 * dcurrHP, 1, 1));
+        hpBarZ[i].style.border = height / 2 + "px solid #181818";
+        dcurrHP = clamp(people[peopleNames[i]].mana / people[peopleNames[i]].maxMana,0,1);
+        [left, top, width, height] = translateXY(people[peopleNames[i]].xPosition + people[peopleNames[i]].xPosHP * people[peopleNames[i]].size,
+            people[peopleNames[i]].yPosition + ((people[peopleNames[i]].yPosHP + 8 * people[peopleNames[i]].sHP * people[peopleNames[i]].size) * people[peopleNames[i]].size), 
+            people[peopleNames[i]].sizeX * people[peopleNames[i]].sHP * people[peopleNames[i]].size, 
+            4 * people[peopleNames[i]].sHP * people[peopleNames[i]].size
+            );
+        changeAtt(mpBarZ[i], left, top, width, height);
+        changeAtt(mpBarB[i], "", "", width, height, gRC(4 - (dcurrHP / 2), 0.25, 1));
+        changeAtt(mpBarA[i], "", "", dcurrHP * width, height, gRC(4 - (dcurrHP / 2), 1, 1));
+        mpBarZ[i].style.border = height + "px solid #181818";
     }
 }
 

@@ -8,10 +8,19 @@ body {
 
 .bar {
   margin-bottom: 10px;
+  position: absolute;
+  z-index: 1;
+}
+
+.last {
+  position: absolute;
+  z-index: 2;
 }
 
 .fill {
   transition-duration: 0.3s;
+  position: absolute;
+  z-index: 3;
 }
 
 .character {

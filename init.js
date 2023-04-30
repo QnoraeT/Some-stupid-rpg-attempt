@@ -43,16 +43,16 @@ const elementList = ["Normal", "Water", "Fire", "Grass", "Electric", "Ice", "Air
 for (let i = 1; i <= 16; ++i){
     comboSound.push(new Audio('sfx/combo_' + i + '.mp3'));
     comboSound.push(new Audio('sfx/combo_' + i + '_power.mp3'));
-}
+}*/
 
-const sfxMP3 = [];
-for (let i = 1; i <= 1; ++i){
-    comboSound.push(new Audio('sfx/sfx' + i + '.mp3'));
-}
+/*const sfxMP3 = [];
+for (let i = 0; i < 1; ++i){
+    sfxMP3.push(new Audio('sfx/sfx' + i + '.mp3'));
+}*/
 
-const sfxWAV = [];
-for (let i = 1; i <= 2; ++i){
-    comboSound.push(new Audio('sfx/sfx' + i + '.wav'));
+/*const sfxWAV = [];
+for (let i = 0; i < 3; ++i){
+    sfxWAV.push(new Audio('sfx/sfx' + i + '.wav'));
 }*/
 
 let musicState = 0;
@@ -140,6 +140,7 @@ class Character {
         if (this.sEffects.includes(16)) mod *= 0.8
         this.trueDDef = mod;
         mod = 1;
+        if (this.HPtype == "NC") mod /= 2
         this.truePDef = mod;
         mod = rand(0.8, 1.2);
         if (this.sEffects.includes(3)) mod *= 0.7
@@ -240,20 +241,10 @@ for (let i = 0; i < music.length; ++i){
     music[i].load();
 }
 
-/*                
-        <img class="character character0" id="character0">
-            <div class="bar-container bar" id="hp0-container">
-                <div class="empty" id="hp0c"></div>
-                <div class="last" id="hp0b"></div>
-                <div class="fill" id="hp0a"></div>
-            </div>
-        </img>
-*/
-
 let people = {
-    "Alterian Skyler": new Character("Alterian Skyler", 1, 0, 0, 1, -67.5, 160, 1, 45, 0, 47, 11, ["Normal", "Electric"], 7, 2.3, 16, "Normal", "PlayerBoss", 0, 128, 256),
+    "Alterian Skyler": new Character("Alterian Skyler", 1, 0, 0, 1, -70, 120, 1, 45, 0, 47, 11, ["Normal", "Electric"], 7, 2.3, 16, "NC", "PlayerBoss", 0, 128, 256),
     //"Alterian Skyler": new Character("Alterian Skyler", 89, 0, 100, 1, -16.5, 20, 1, 45, 0, 150, 15, "Normal", "Electric", 10, 2, 16, "Normal", "PlayerBoss", 0, 128, 256),
-    //"ToWM TowerSB": new Character("ToWM TowerSB", 70, -50, -50, 1, 0, 40, 1, 35, 0, 55, 10, ["Normal"], 25, 10, 16, "Normal", "Player", 1, 128, 256),
+    //"ToWM TowerSB": new Character("ToWM TowerSB", 70, -150, -150, 1, -70, 150, 1, 35, 0, 55, 10, ["Normal"], 25, 10, 16, "Normal", "Player", 1, 128, 256),
     //"ToFUN TowerSB": new Character("ToFUN TowerSB", 70, -30, -50, 1, 0, 40, 1, 40, 0, 50, 16, ["Normal"], 40, 20, 10, "Normal", "Player", 1, 128, 256),
     //"Delet Ball": new Character("Delet Ball", 1, 50, -50, 1, 0, 25, 1, 1e7, 0, 172554, 19886, ["Dark"], 27446, 10965, 31, "Normal", "Boss", 2, 256, 256)
 }
@@ -263,6 +254,9 @@ let hpBarZ = [];
 let hpBarA = [];
 let hpBarB = [];
 let hpBarC = [];
+let mpBarZ = [];
+let mpBarA = [];
+let mpBarB = [];
 for (let i = 0; i < peopleNames.length; i++){
     let name = "character" + i
     const char = document.createElement("img");
@@ -272,31 +266,57 @@ for (let i = 0; i < peopleNames.length; i++){
     document.getElementById(name).classList.add("character" + i)
     document.getElementById(name).classList.add("character")
     characters.push(document.getElementById(name))
+    
     const hpCon = document.createElement("div")
     name = "hp" + i + "-container"
     hpCon.id = name;
-    char.appendChild(hpCon);
+    MAIN.appendChild(hpCon);
     document.getElementById(name).classList.add("bar-container")
     document.getElementById(name).classList.add("bar")
     hpBarZ.push(document.getElementById(name))
-    const hpC = document.createElement("div")
-    name = "hp" + i + "c"
-    hpC.id = name;
-    hpCon.appendChild(hpC);
-    document.getElementById(name).classList.add("empty")
-    hpBarC.push(document.getElementById(name))
-    const hpB = document.createElement("div")
-    name = "hp" + i + "b"
-    hpB.id = name;
-    hpCon.appendChild(hpB);
-    document.getElementById(name).classList.add("last")
-    hpBarB.push(document.getElementById(name))
+
     const hpA = document.createElement("div")
     name = "hp" + i + "a"
     hpA.id = name;
     hpCon.appendChild(hpA);
     document.getElementById(name).classList.add("fill")
     hpBarA.push(document.getElementById(name))
+
+    const hpB = document.createElement("div")
+    name = "hp" + i + "b"
+    hpB.id = name;
+    hpCon.appendChild(hpB);
+    document.getElementById(name).classList.add("last")
+    hpBarB.push(document.getElementById(name))
+
+    const hpC = document.createElement("div")
+    name = "hp" + i + "c"
+    hpC.id = name;
+    hpCon.appendChild(hpC);
+    document.getElementById(name).classList.add("empty")
+    hpBarC.push(document.getElementById(name))
+
+    const mpCon = document.createElement("div")
+    name = "mp" + i + "-container"
+    mpCon.id = name;
+    MAIN.appendChild(mpCon);
+    document.getElementById(name).classList.add("bar-container")
+    document.getElementById(name).classList.add("bar")
+    mpBarZ.push(document.getElementById(name))
+
+    const mpA = document.createElement("div")
+    name = "mp" + i + "a"
+    mpA.id = name;
+    mpCon.appendChild(mpA);
+    document.getElementById(name).classList.add("fill")
+    mpBarA.push(document.getElementById(name))
+
+    const mpB = document.createElement("div")
+    name = "mp" + i + "b"
+    mpB.id = name;
+    mpCon.appendChild(mpB);
+    document.getElementById(name).classList.add("empty")
+    mpBarB.push(document.getElementById(name))
 }
 done = true
 resize();
