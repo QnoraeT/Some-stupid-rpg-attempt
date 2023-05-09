@@ -4,8 +4,10 @@ let canvasSize = {width: 0, height: 0};
 window.addEventListener('resize', resize);
     
 function resize(){
-    canvasSize.width = 960;
-    canvasSize.height = 640;
+    canvasSize.width = 0;
+    canvasSize.height = 0;
+    canvasSize.width = window.innerWidth;
+    canvasSize.height = window.innerHeight;
     /*
         var h = 640;
         var width = window.innerWidth || document.body.clientWidth; 
@@ -22,7 +24,7 @@ let CamX = 0;
 let CamY = 0;
 let Zoom = 1;
 let Shake = 0;
-let ShakeDecay = 0.01;
+let ShakeDecay = 0.1;
 let ShakeX = 0;
 let ShakeY = 0;
 let Time = 0;
@@ -60,6 +62,9 @@ let musicUpdate = 0;
 let peopleNames = [];
 let turnOrder = [];
 let lastHP = [];
+let shakeRandomListX = [0, 1];
+let shakeRandomListY = [0, 1];
+let shakeRandomInterval = 0;
 
 for (let i = 0; i < music.length; ++i){
     music[i].loop = true;
@@ -110,10 +115,13 @@ class Character {
         this.hitTimer = 1;
         this.trueDDef = 1;
         this.truePDef = 1;
-        this.brightness = 0.50; // 0.00 = fully black, 1.00 = fully white, multiplicative
-        this.transparency = 1.00; // 0.00 = invisible, 1.00 = visible
-        this.hueChange = 0; // 0 = FF0000 (assuming default), 1 = FFFF00, 2 = 00FF00, etc
+        this.brightness = 1.00; // brightness
+        this.transparency = 1.00; // opac
+        this.hueChange = 0; // degrees
         this.direction = 90; //angle 90 = right, 0 = up, -90 = left, -180/180 = down
+        this.invert = 0.00;
+        this.grayScale = 0.00;
+        this.flip = [false, false] // [0] = horizontal flip, [1] = vertical flip
         lastHP.push(this.health);
         peopleNames.push(this.name);
     }
@@ -216,7 +224,7 @@ class Character {
         // they determine when a certain crit type happens!
         // example: CritChance = [10, 2, 0.1]
         // example: CritDmg = [2.3, 3.5, 45]
-        // lowest crit chance goes first, so check 0.1% with 45x. [IT HAS TO BE IN ORDER!! HIGHEST CHANCE -> LOWEST CHANCE]
+        // lowest crit chance goes first, so check 0.1% with 45x. 
         // if it doesn't trigger, then 2% with 3.5x is tested
         // if it doesn't trigger, then 10% with 2.3x is tested
         // if it doesn't trigger, then no more crit functions will be checked for this attack.
@@ -235,18 +243,16 @@ class Character {
     }
 }
 
-
-
 for (let i = 0; i < music.length; ++i){
     music[i].load();
 }
 
 let people = {
-    "Alterian Skyler": new Character("Alterian Skyler", 1, 0, 0, 1, -70, 120, 1, 45, 0, 47, 11, ["Normal", "Electric"], 7, 2.3, 16, "NC", "PlayerBoss", 0, 128, 256),
-    //"Alterian Skyler": new Character("Alterian Skyler", 89, 0, 100, 1, -16.5, 20, 1, 45, 0, 150, 15, "Normal", "Electric", 10, 2, 16, "Normal", "PlayerBoss", 0, 128, 256),
-    //"ToWM TowerSB": new Character("ToWM TowerSB", 70, -150, -150, 1, -70, 150, 1, 35, 0, 55, 10, ["Normal"], 25, 10, 16, "Normal", "Player", 1, 128, 256),
-    //"ToFUN TowerSB": new Character("ToFUN TowerSB", 70, -30, -50, 1, 0, 40, 1, 40, 0, 50, 16, ["Normal"], 40, 20, 10, "Normal", "Player", 1, 128, 256),
-    //"Delet Ball": new Character("Delet Ball", 1, 50, -50, 1, 0, 25, 1, 1e7, 0, 172554, 19886, ["Dark"], 27446, 10965, 31, "Normal", "Boss", 2, 256, 256)
+    //                                                    Lv  XPos  YPos  S  HPX HPY HPS XPR XPS BaseHP  BaseMP Type(s)                 BATK   BDEF   BSD HPType     PersonType   T  Xs   Ys
+      "Alterian Skyler": new Character("Alterian Skyler", 70,  0,    0,   1, -5, 120, 1, 45,  0, 47,     11,    ["Normal", "Electric"], 35,    8.2,   22, "NC",     "PlayerBoss", 0, 128, 256),
+    //"ToWM TowerSB":    new Character("ToWM TowerSB",    70, -200, -100, 1, -5, 110, 1, 35,  0, 55,     10,    ["Normal"],             25,    10,    16, "Normal", "Player",     1, 128, 256),
+    //"ToFUN TowerSB":   new Character("ToFUN TowerSB",   70, -125, -125, 1, -5, 120, 1, 40,  0, 50,     16,    ["Normal"],             40,    20,    10, "Normal", "Player",     1, 128, 256),
+    //"Delet Ball":      new Character("Delet Ball",      1,   200, -100, 1, -5, 60,  1, 1e7, 0, 172554, 19886, ["Dark"],               27446, 10965, 31, "Normal", "Boss",       2, 128, 128),
 }
 
 let characters = [];

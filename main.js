@@ -379,6 +379,9 @@ function lerp(t, s, e, type, p){
         case "ExpSCurve": 
             t =  (Math.tanh(p * Math.tan((t + 1.5 - ((t - 0.5) / 1e9)) * Math.PI)) + 1) / 2;
             break;
+        case "Sine": 
+            t =  Math.sin(t * Math.PI / 2) ** 2;
+            break;
         case "Expo": 
         if (p > 0) {
             t = Math.coth(p / 2)*Math.tanh(p * t / 2);
@@ -404,6 +407,9 @@ function newMusic(m){
 
 function updateVisuals(){
     if (Zoom <= 0){console.error("Hey WTF! Who set the zoom to " + Zoom + "!?"); Zoom = 1;}
+    Shake = Math.max(Shake * (ShakeDecay ** delta), 0)
+    ShakeX = Shake * lerp(((Time - shakeRandomInterval) / 0.02) + 1, shakeRandomListX[0], shakeRandomListX[1], "Sine")
+    ShakeY = Shake * lerp(((Time - shakeRandomInterval) / 0.02) + 1, shakeRandomListY[0], shakeRandomListY[1], "Sine")
     let dlastHP;
     let dcurrHP;
     for (let i = 0; i < peopleNames.length; ++i){
@@ -414,28 +420,38 @@ function updateVisuals(){
             people[peopleNames[i]].size, 0
             );
         changeAtt(characters[i], left, top, "", "", "", "characters/" + peopleNames[i] + "/assets/" + people[peopleNames[i]].spriteState + ".svg");
-        characters[i].style.transform = "translate(-50%, -50%) scale(" + width + ")";
+        characters[i].style.transform = "translate(-50%, -50%) scale(" + (width*people[peopleNames[i]].flip[0]?-1:1) + "," + (people[peopleNames[i]].flip[1]?-1:1) + ") rotate(" + (people[peopleNames[i]].direction - 90) + "deg)";
+        let FIL = 
+        "hue-rotate(" + people[peopleNames[i]].hueChange + "deg) " + 
+        "brightness(" + people[peopleNames[i]].brightness + ") " + 
+        "opacity(" + people[peopleNames[i]].transparency*100 + "%) " + 
+        "invert(" + people[peopleNames[i]].invert*100 + "%) " + 
+        "grayscale(" + people[peopleNames[i]].grayScale*100 + "%) "
+        characters[i].style['filter'] = FIL
+        characters[i].style['-webkit-filter'] = FIL
+
         // update HP bars
-        [left, top, width, height] = translateXY(people[peopleNames[i]].xPosition + people[peopleNames[i]].xPosHP * people[peopleNames[i]].size,
+        // oh my god why does it error if i tried to make this an alone array or someth9ing iudngbio
+        let stupidFix = [left, top, width, height] = translateXY(people[peopleNames[i]].xPosition + people[peopleNames[i]].xPosHP * people[peopleNames[i]].size - (people[peopleNames[i]].sizeX * 0.5),
             people[peopleNames[i]].yPosition + people[peopleNames[i]].yPosHP * people[peopleNames[i]].size, 
             people[peopleNames[i]].sizeX * people[peopleNames[i]].sHP * people[peopleNames[i]].size, 
             8 * people[peopleNames[i]].sHP * people[peopleNames[i]].size
             );
-        changeAtt(hpBarZ[i], left, top, width, height);
-        changeAtt(hpBarC[i], "", "", width, height, gRC(2 * dcurrHP, 0.25, 1));
-        changeAtt(hpBarB[i], "", "", dlastHP * width, height, gRC(1, 0.9, (Math.sin(24 * Time) / 2) + 0.5));
-        changeAtt(hpBarA[i], "", "", dcurrHP * width, height, gRC(2 * dcurrHP, 1, 1));
-        hpBarZ[i].style.border = height / 2 + "px solid #181818";
+        changeAtt(hpBarZ[i], stupidFix[0], stupidFix[1], stupidFix[2], stupidFix[3]);
+        changeAtt(hpBarC[i], "", "", stupidFix[2], stupidFix[3], gRC(2 * dcurrHP, 0.25, 1));
+        changeAtt(hpBarB[i], "", "", dlastHP * stupidFix[2], stupidFix[3], gRC(1, 0.9, (Math.sin(24 * Time) / 2) + 0.5));
+        changeAtt(hpBarA[i], "", "", dcurrHP * stupidFix[2], stupidFix[3], gRC(2 * dcurrHP, 1, 1));
+        hpBarZ[i].style.border = stupidFix[3] / 2 + "px solid #181818";
         dcurrHP = clamp(people[peopleNames[i]].mana / people[peopleNames[i]].maxMana,0,1);
-        [left, top, width, height] = translateXY(people[peopleNames[i]].xPosition + people[peopleNames[i]].xPosHP * people[peopleNames[i]].size,
+        stupidFix = translateXY(people[peopleNames[i]].xPosition + people[peopleNames[i]].xPosHP * people[peopleNames[i]].size - (people[peopleNames[i]].sizeX * 0.5),
             people[peopleNames[i]].yPosition + ((people[peopleNames[i]].yPosHP + 8 * people[peopleNames[i]].sHP * people[peopleNames[i]].size) * people[peopleNames[i]].size), 
             people[peopleNames[i]].sizeX * people[peopleNames[i]].sHP * people[peopleNames[i]].size, 
             4 * people[peopleNames[i]].sHP * people[peopleNames[i]].size
             );
-        changeAtt(mpBarZ[i], left, top, width, height);
-        changeAtt(mpBarB[i], "", "", width, height, gRC(4 - (dcurrHP / 2), 0.25, 1));
-        changeAtt(mpBarA[i], "", "", dcurrHP * width, height, gRC(4 - (dcurrHP / 2), 1, 1));
-        mpBarZ[i].style.border = height + "px solid #181818";
+        changeAtt(mpBarZ[i], stupidFix[0], stupidFix[1], stupidFix[2], stupidFix[3]);
+        changeAtt(mpBarB[i], "", "", stupidFix[2], stupidFix[3], gRC(4 - (dcurrHP / 2), 0.25, 1));
+        changeAtt(mpBarA[i], "", "", dcurrHP * stupidFix[2], stupidFix[3], gRC(4 - (dcurrHP / 2), 1, 1));
+        mpBarZ[i].style.border = stupidFix[3] + "px solid #181818";
     }
 }
 
@@ -529,11 +545,18 @@ function translateXY(x,y,xs,ys){
     let oldTimeStamp = 0; 
 
     function gameLoop(timeStamp){
-        if (done === false) return
+        if (done === false) {console.log("not done!"); window.requestAnimationFrame(gameLoop); return;}
         delta = ((timeStamp - oldTimeStamp) / 1000) * TimeSpeed
         const FPS = Math.round(TimeSpeed / delta)
         Time = Time + delta
         music[musicState].volume = musicVolume
+        if (Time > shakeRandomInterval){
+            shakeRandomListX.push((Math.random() - 0.5) * 2)
+            shakeRandomListX.splice(0,1)
+            shakeRandomListY.push((Math.random() - 0.5) * 2)
+            shakeRandomListY.splice(0,1)
+            shakeRandomInterval =  Time + 0.02
+        }
         updateVisuals()
         updateLastHP()
         // do not change
@@ -557,6 +580,7 @@ function getTurnOrder(){
         turnOrder.push(people[peopleNames[i]].trueSpd)
     }
     turnOrder = turnOrder.sort(function(a, b){return a - b})
+    console.log(turmOrder)
     let turnNames = []
     for (let i = 0; i < peopleNames.length; ++i){
         for (let j = 0; j < peopleNames.length; ++j){
