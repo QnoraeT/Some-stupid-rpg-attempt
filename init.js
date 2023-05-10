@@ -65,6 +65,14 @@ let lastHP = [];
 let shakeRandomListX = [0, 1];
 let shakeRandomListY = [0, 1];
 let shakeRandomInterval = 0;
+let turnSeq = 0;
+let turns = 0;
+let timeForTurn = 5.00;
+let lastTurn = 0;
+let turnID = 0;
+let currentState = {
+    ended: 0
+}
 
 for (let i = 0; i < music.length; ++i){
     music[i].loop = true;
@@ -124,6 +132,7 @@ class Character {
         this.flip = [false, false] // [0] = horizontal flip, [1] = vertical flip
         lastHP.push(this.health);
         peopleNames.push(this.name);
+        this.alive = true
     }
 
     updateSTATEffects(){
@@ -248,11 +257,15 @@ for (let i = 0; i < music.length; ++i){
 }
 
 let people = {
-    //                                                    Lv  XPos  YPos  S  HPX HPY HPS XPR XPS BaseHP  BaseMP Type(s)                 BATK   BDEF   BSD HPType     PersonType   T  Xs   Ys
-      "Alterian Skyler": new Character("Alterian Skyler", 70,  0,    0,   1, -5, 120, 1, 45,  0, 47,     11,    ["Normal", "Electric"], 35,    8.2,   22, "NC",     "PlayerBoss", 0, 128, 256),
-    //"ToWM TowerSB":    new Character("ToWM TowerSB",    70, -200, -100, 1, -5, 110, 1, 35,  0, 55,     10,    ["Normal"],             25,    10,    16, "Normal", "Player",     1, 128, 256),
-    //"ToFUN TowerSB":   new Character("ToFUN TowerSB",   70, -125, -125, 1, -5, 120, 1, 40,  0, 50,     16,    ["Normal"],             40,    20,    10, "Normal", "Player",     1, 128, 256),
-    //"Delet Ball":      new Character("Delet Ball",      1,   200, -100, 1, -5, 60,  1, 1e7, 0, 172554, 19886, ["Dark"],               27446, 10965, 31, "Normal", "Boss",       2, 128, 128),
+    //                                                    Lv  XPos  YPos  S  HPX HPY HPS XPR XPS BaseHP  BaseMP Type(s)                 BATK    BDEF   BSD HPType     PersonType   T  Xs   Ys
+    //"Alterian Skyler": new Character("Alterian Skyler", 70,  0,    0,   1, -5, 120, 1, 45,  0, 47,     11,    ["Normal", "Electric"], 35,     8.2,   22, "NC",     "PlayerBoss", 0, 128, 256),
+    //"ToWM TowerSB":    new Character("ToWM TowerSB",    70, -200, -100, 1, -5, 110, 1, 35,  0, 55,     10,    ["Normal"],             25,     10,    16, "Normal", "Player",     1, 128, 256),
+    //"ToFUN TowerSB":   new Character("ToFUN TowerSB",   70, -125, -125, 1, -5, 120, 1, 40,  0, 50,     16,    ["Normal"],             40,     20,    10, "Normal", "Player",     1, 128, 256),
+    //"Delet Ball":      new Character("Delet Ball",      1,   200, -100, 1, -5, 60,  1, 1e7, 0, 310096, 19886, ["Dark"],               153031, 25084, 31, "Normal", "Boss",       2, 128, 128),
+      "Alterian Skyler": new Character("Alterian Skyler", 1,   0,    0,   1, -5, 120, 1, 45,  0, 47,     11,    ["Normal", "Electric"], 35,     8.2,   22, "NC",     "PlayerBoss", 0, 128, 256),
+      "ToWM TowerSB":    new Character("ToWM TowerSB",    1,  -200, -100, 1, -5, 110, 1, 35,  0, 55,     10,    ["Normal"],             25,     10,    16, "Normal", "Player",     0, 128, 256),
+      "ToFUN TowerSB":   new Character("ToFUN TowerSB",   1,  -125, -125, 1, -5, 120, 1, 40,  0, 50,     16,    ["Normal"],             40,     20,    10, "Normal", "Player",     0, 128, 256),
+      "Delet Ball":      new Character("Delet Ball",      1,   200, -100, 1, -5, 60,  1, 1e7, 0, 10000,  1000,  ["Dark"],               16,     0,     19, "Normal", "Boss",       1, 128, 128),
 }
 
 let characters = [];

@@ -2,7 +2,7 @@
 let pos = [];
 
 function rand(min, max){
-    return Math.random()*(max-min)+min
+    return Math.random()*(max-min)+min;
 }
 
 function checkElementEffective(attacking, d){
@@ -407,9 +407,9 @@ function newMusic(m){
 
 function updateVisuals(){
     if (Zoom <= 0){console.error("Hey WTF! Who set the zoom to " + Zoom + "!?"); Zoom = 1;}
-    Shake = Math.max(Shake * (ShakeDecay ** delta), 0)
-    ShakeX = Shake * lerp(((Time - shakeRandomInterval) / 0.02) + 1, shakeRandomListX[0], shakeRandomListX[1], "Sine")
-    ShakeY = Shake * lerp(((Time - shakeRandomInterval) / 0.02) + 1, shakeRandomListY[0], shakeRandomListY[1], "Sine")
+    Shake = Math.max(Shake * (ShakeDecay ** delta), 0);
+    ShakeX = Shake * lerp(((Time - shakeRandomInterval) / 0.02) + 1, shakeRandomListX[0], shakeRandomListX[1], "Sine");
+    ShakeY = Shake * lerp(((Time - shakeRandomInterval) / 0.02) + 1, shakeRandomListY[0], shakeRandomListY[1], "Sine");
     let dlastHP;
     let dcurrHP;
     for (let i = 0; i < peopleNames.length; ++i){
@@ -420,18 +420,25 @@ function updateVisuals(){
             people[peopleNames[i]].size, 0
             );
         changeAtt(characters[i], left, top, "", "", "", "characters/" + peopleNames[i] + "/assets/" + people[peopleNames[i]].spriteState + ".svg");
-        characters[i].style.transform = "translate(-50%, -50%) scale(" + (width*people[peopleNames[i]].flip[0]?-1:1) + "," + (people[peopleNames[i]].flip[1]?-1:1) + ") rotate(" + (people[peopleNames[i]].direction - 90) + "deg)";
+        characters[i].style.transform = "translate(-50%, -50%) scale(" + (width*(people[peopleNames[i]].flip[0]?-1:1)) + "," + (width*(people[peopleNames[i]].flip[1]?-1:1)) + ") rotate(" + (people[peopleNames[i]].direction - 90) + "deg)";
         let FIL = 
         "hue-rotate(" + people[peopleNames[i]].hueChange + "deg) " + 
         "brightness(" + people[peopleNames[i]].brightness + ") " + 
         "opacity(" + people[peopleNames[i]].transparency*100 + "%) " + 
         "invert(" + people[peopleNames[i]].invert*100 + "%) " + 
         "grayscale(" + people[peopleNames[i]].grayScale*100 + "%) "
-        characters[i].style['filter'] = FIL
-        characters[i].style['-webkit-filter'] = FIL
+        characters[i].style['filter'] = FIL;
+        characters[i].style['-webkit-filter'] = FIL;
 
         // update HP bars
-        // oh my god why does it error if i tried to make this an alone array or someth9ing iudngbio
+        // ! oh my god why does it error if i tried to make this an alone array or someth9ing iudngbio
+        // in.js:435 Uncaught TypeError: Cannot assign to read only property '0' of string 'hue-rotate(0deg) brightness(1) opacity(100%) invert(0%) grayscale(0%) '
+        //     at updateVisuals (main.js:435:36)
+        //     at gameLoop (main.js:583:9)
+        // updateVisuals @ main.js:435
+        // gameLoop @ main.js:583
+        // requestAnimationFrame (async)
+        // (anonymous) @ main.js:543
         let stupidFix = [left, top, width, height] = translateXY(people[peopleNames[i]].xPosition + people[peopleNames[i]].xPosHP * people[peopleNames[i]].size - (people[peopleNames[i]].sizeX * 0.5),
             people[peopleNames[i]].yPosition + people[peopleNames[i]].yPosHP * people[peopleNames[i]].size, 
             people[peopleNames[i]].sizeX * people[peopleNames[i]].sHP * people[peopleNames[i]].size, 
@@ -474,7 +481,6 @@ function updateLastHP(){
             } else {
                 lastHP[i] = people[peopleNames[i]].health;
             }
-
         }
     }
 }
@@ -546,22 +552,45 @@ function translateXY(x,y,xs,ys){
 
     function gameLoop(timeStamp){
         if (done === false) {console.log("not done!"); window.requestAnimationFrame(gameLoop); return;}
-        delta = ((timeStamp - oldTimeStamp) / 1000) * TimeSpeed
-        const FPS = Math.round(TimeSpeed / delta)
-        Time = Time + delta
-        music[musicState].volume = musicVolume
+        delta = ((timeStamp - oldTimeStamp) / 1000) * TimeSpeed;
+        const FPS = Math.round(TimeSpeed / delta);
+        Time = Time + delta;
+        music[musicState].volume = musicVolume;
         if (Time > shakeRandomInterval){
-            shakeRandomListX.push((Math.random() - 0.5) * 2)
-            shakeRandomListX.splice(0,1)
-            shakeRandomListY.push((Math.random() - 0.5) * 2)
-            shakeRandomListY.splice(0,1)
-            shakeRandomInterval =  Time + 0.02
+            shakeRandomListX.push((Math.random() - 0.5) * 2);
+            shakeRandomListX.splice(0,1);
+            shakeRandomListY.push((Math.random() - 0.5) * 2);
+            shakeRandomListY.splice(0,1);
+            shakeRandomInterval =  Time + 0.02;
         }
-        updateVisuals()
-        updateLastHP()
+        if (Time > lastTurn){
+            let alive = checkForAlive();
+            if (alive[2].length == 0){currentState.ended = Infinity;} // a tie, but everyone is knocked out smh
+            if (alive[2].length == 1){currentState.ended = alive[2][0];} // winning team
+            if (currentState.ended == 0){
+                getTurnOrder(alive[0], alive[1]);
+                try {
+                    doTurn(turnOrder[turnID].name);
+                } catch (e) {
+                    console.info("Next person (" + turnOrder[turnID].name + ") died before they could get their turn!")
+                    turnID = 0;
+                    turnSeq++;
+                    doTurn(turnOrder[turnID].name);
+                }
+                console.log(turnOrder[turnID].name + "'s turn!");
+                turnID++;
+                if (turnID >= alive[1]){
+                    turnID = 0;
+                    turnSeq++;
+                }
+                lastTurn = Time + timeForTurn;
+            }
+        }
+        updateVisuals();
+        updateLastHP();
         // do not change
-        oldTimeStamp = timeStamp
-        window.requestAnimationFrame(gameLoop)
+        oldTimeStamp = timeStamp;
+        window.requestAnimationFrame(gameLoop);
     }
 }
 
@@ -571,22 +600,33 @@ function comboSFX(amt, pow){
 }
 
 function start(){
-    newMusic(musicState)
+    newMusic(musicState);
 }
 
-function getTurnOrder(){
-    // this is still not done
+function checkForAlive(){
+    let temp = [];
+    let teamsAlive = [];
+    let length = 0;
     for (let i = 0; i < peopleNames.length; ++i){
-        turnOrder.push(people[peopleNames[i]].trueSpd)
-    }
-    turnOrder = turnOrder.sort(function(a, b){return a - b})
-    console.log(turmOrder)
-    let turnNames = []
-    for (let i = 0; i < peopleNames.length; ++i){
-        for (let j = 0; j < peopleNames.length; ++j){
-
+        if (people[peopleNames[i]].alive) {
+            temp.push(people[peopleNames[i]]); 
+            if (!teamsAlive.includes(people[peopleNames[i]].team)){
+                teamsAlive.push(people[peopleNames[i]].team)
+            }
+            length++;
         }
     }
-    console.log(turnNames)
+    return [temp, length, teamsAlive];
 }
 
+function doTurn(){
+
+}
+
+function getTurnOrder(list, len){
+    turnOrder = [];
+    for (let i = 0; i < len; ++i){
+        turnOrder.push(list[i]);
+    }
+    turnOrder = turnOrder.sort((a, b) => b.trueSpd - a.trueSpd);
+}
