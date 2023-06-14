@@ -1,6 +1,2 @@
-function doTurn(){
-    console.log("i exist! [Alterian Skyler]")
-}
-
-
-export const name = "Alterian Skyler";
+let Delet_Ball = newPersonAttributes(people["Delet Ball"])
+export default Delet_Ball

@@ -1,4 +1,13 @@
 "use strict";
+import Alterian_Skyler from "./characters/Alterian Skyler/main.mjs";
+import Delet_Ball from "./characters/Delet Ball/main.mjs";
+import ToFUN_TowerSB from "./characters/ToFUN TowerSB/main.mjs";
+import ToWM_TowerSB from "./characters/ToWM TowerSB/main.mjs";
+
+function getPersonFunc(person, func, ...arg){
+    return peopleObj[person.replace(" ", "_")][func](...arg) // what
+}
+
 let pos = [];
 
 function rand(min, max){
@@ -546,9 +555,21 @@ function translateXY(x,y,xs,ys){
     ];
 }
 
-{
+jQuery(function () {
     window.requestAnimationFrame(gameLoop);
     let oldTimeStamp = 0; 
+
+    peopleObj = {
+        Alterian_Skyler,
+        Delet_Ball,
+        ToFUN_TowerSB,
+        ToWM_TowerSB,
+    }
+    
+    for (let i = 0; i < peopleNames.length; i++){
+        getPersonFunc(peopleNames[i], "introduction")
+        getPersonFunc(peopleNames[i], "target", ["normal", "normal"])
+    }
 
     function gameLoop(timeStamp){
         if (done === false) {console.log("not done!"); window.requestAnimationFrame(gameLoop); return;}
@@ -569,15 +590,15 @@ function translateXY(x,y,xs,ys){
             if (alive[2].length == 1){currentState.ended = alive[2][0];} // winning team
             if (currentState.ended == 0){
                 getTurnOrder(alive[0], alive[1]);
+                console.log(turnOrder[turnID].name + "'s turn!");
                 try {
-                    doTurn(turnOrder[turnID].name);
+                    getPersonFunc(turnOrder[turnID].name, "doTurn")
                 } catch (e) {
                     console.info("Next person (" + turnOrder[turnID].name + ") died before they could get their turn!")
                     turnID = 0;
                     turnSeq++;
-                    doTurn(turnOrder[turnID].name);
+                    getPersonFunc(turnOrder[turnID].name, "doTurn")
                 }
-                console.log(turnOrder[turnID].name + "'s turn!");
                 turnID++;
                 if (turnID >= alive[1]){
                     turnID = 0;
@@ -592,7 +613,7 @@ function translateXY(x,y,xs,ys){
         oldTimeStamp = timeStamp;
         window.requestAnimationFrame(gameLoop);
     }
-}
+});
 
 function comboSFX(amt, pow){
     let x = ((amt - 1) * 2) + pow
@@ -617,10 +638,6 @@ function checkForAlive(){
         }
     }
     return [temp, length, teamsAlive];
-}
-
-function doTurn(){
-
 }
 
 function getTurnOrder(list, len){

@@ -1,6 +1,2 @@
-function doTurn(){
-    console.log("i exist! [Alterian Skyler]")
-}
-
-
-export const name = "Alterian Skyler";
+let Alterian_Skyler = newPersonAttributes(people["Alterian Skyler"])
+export default Alterian_Skyler

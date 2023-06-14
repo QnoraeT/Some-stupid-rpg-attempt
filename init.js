@@ -20,6 +20,46 @@ function resize(){
     */
 }
 
+function newPersonAttributes(person){
+    let temp
+    temp = {
+        name: person.name,
+        introduction() {
+            console.log("hi!! i am " + person.name + " and i think i'm supposed to be initalizing quickly... good luck!")
+        },
+        target(ieType) {
+            let temp
+            let candidates = people
+            let candidatesNames = peopleNames
+            console.log(candidates)
+            if (ieType[1] !== "includeDead") {
+                for (let i = 0; i < candidatesNames.length; ++i){
+                    if (candidates[candidatesNames[i]].alive == false) {
+                        console.info(candidatesNames[i] + " is dead")
+                        delete candidates[i]
+                        candidatesNames = candidatesNames.splice(i, 1)
+                    }
+                }
+            }
+            console.log(candidates)
+            switch (ieType[0]){
+                case "self":
+                    return person.name
+                case "normal":
+
+                    break;
+                default:
+                    console.warn("no, " + ieType[0] + " does not exist.")
+            }
+        },
+        doTurn() {
+            console.log(person.name + " said to die!")
+        },
+    }
+    return temp
+}
+
+let peopleObj = {};
 let CamX = 0;
 let CamY = 0;
 let Zoom = 1;
@@ -40,6 +80,7 @@ const effectList = ["Burn", "Poison", "Sunstroke", "Paralyze", "Sleep", "Freeze"
 const music = [new Audio('music/forget not (shortened).mp3'), new Audio('music/something with danidanijr V3.6 NO ARTS.mp3')];
 const critNames = ["Critical", "Deadly", "Super", "Ultra", "Hyper", "EXTREME", "ULTIMATE", "HOLY"];
 const elementList = ["Normal", "Water", "Fire", "Grass", "Electric", "Ice", "Air", "Dark", "Light", "Earth", "Fighting", "Poison", "Insect", "Rock", "Metal", "Spirit", "Psychic", "Dragon", "Mystic", "Sound", "Crystal", "Mech", "Time", "Chemical", "Explosive", "Magic", "Plasma", "Volcanic", "Glass", "Virus", "Cyber", "Celestial", "Cosmic", "Magnetic", "Spectra", "Wood", "Soul", "Shadow", "Nuclear", "Ancient"]
+
 /*const comboSound = [];
 
 for (let i = 1; i <= 16; ++i){
@@ -111,7 +152,7 @@ class Character {
         this.sDuration = [];
         this.sStrength = [];
         this.spriteState = "Idle1";
-        this.extraInfo = ["", "", 100] // who hit me?, who healed me?, my mood;
+        this.extraInfo = ["", ""] // who hit me?, who healed me?
         this.sizeX = sizeX;
         this.sizeY = sizeY;
         this.SuperPower = 0;
@@ -141,34 +182,34 @@ class Character {
         // "Fast", "Unstable Magic", "Bad Poison", "Silence", "Strong", "Weak"];
         let mod;
         mod = 1;
-        if (this.sEffects.includes(16)) mod *= 1.667
-        if (this.sEffects.includes(21)) mod *= 1.75
-        if (this.sEffects.includes(22)) mod *= 0.6
+        if (this.sEffects.includes(16)) {mod *= 1.667;}
+        if (this.sEffects.includes(21)) {mod *= 1.75;}
+        if (this.sEffects.includes(22)) {mod *= 0.6;}
         this.trueAtk = this.atk * mod;
         mod = 1;
-        if (this.sEffects.includes(9)) mod *= 0.6
-        if (this.sEffects.includes(10)) mod *= 1.333
-        if (this.sEffects.includes(16)) mod /= 1.667
+        if (this.sEffects.includes(9)) {mod *= 0.6;}
+        if (this.sEffects.includes(10)) {mod *= 1.333;}
+        if (this.sEffects.includes(16)) {mod /= 1.667;}
         this.trueDef = this.def * mod;
         mod = 1;
-        if (this.sEffects.includes(9)) mod *= 0.75
-        if (this.sEffects.includes(10)) mod *= 1.5
-        if (this.sEffects.includes(11)) mod *= 1.667
-        if (this.sEffects.includes(16)) mod *= 0.8
+        if (this.sEffects.includes(9)) {mod *= 0.75;}
+        if (this.sEffects.includes(10)) {mod *= 1.5;}
+        if (this.sEffects.includes(11)) {mod *= 1.667;}
+        if (this.sEffects.includes(16)) {mod *= 0.8;}
         this.trueDDef = mod;
         mod = 1;
-        if (this.HPtype == "NC") mod /= 2
+        if (this.HPtype == "NC") {mod /= 2;}
         this.truePDef = mod;
         mod = rand(0.8, 1.2);
-        if (this.sEffects.includes(3)) mod *= 0.7
-        if (this.sEffects.includes(4)) mod *= 0.1
-        if (this.sEffects.includes(5)) mod *= 0.1
-        if (this.sEffects.includes(6)) mod *= 0.7
-        if (this.sEffects.includes(14)) mod *= 0.5
-        if (this.sEffects.includes(15)) mod *= 1.5
-        if (this.sEffects.includes(17)) mod *= 0.667
-        if (this.sEffects.includes(18)) mod *= 1.5
-        if (this.sEffects.includes(20)) mod *= 0.5
+        if (this.sEffects.includes(3)) {mod *= 0.7;}
+        if (this.sEffects.includes(4)) {mod *= 0.1;}
+        if (this.sEffects.includes(5)) {mod *= 0.1;}
+        if (this.sEffects.includes(6)) {mod *= 0.7;}
+        if (this.sEffects.includes(14)) {mod *= 0.5;}
+        if (this.sEffects.includes(15)) {mod *= 1.5;}
+        if (this.sEffects.includes(17)) {mod *= 0.667;}
+        if (this.sEffects.includes(18)) {mod *= 1.5;}
+        if (this.sEffects.includes(20)) {mod *= 0.5;}
         this.trueSpd = this.spd * mod;
     }
 
@@ -277,65 +318,65 @@ let mpBarZ = [];
 let mpBarA = [];
 let mpBarB = [];
 for (let i = 0; i < peopleNames.length; i++){
-    let name = "character" + i
+    let name = "character" + i;
     const char = document.createElement("img");
-    const MAIN = document.getElementById("characters")
+    const MAIN = document.getElementById("characters");
     char.id = name;
     MAIN.appendChild(char);
-    document.getElementById(name).classList.add("character" + i)
-    document.getElementById(name).classList.add("character")
-    characters.push(document.getElementById(name))
+    document.getElementById(name).classList.add("character" + i);
+    document.getElementById(name).classList.add("character");
+    characters.push(document.getElementById(name));
     
-    const hpCon = document.createElement("div")
-    name = "hp" + i + "-container"
+    const hpCon = document.createElement("div");
+    name = "hp" + i + "-container";
     hpCon.id = name;
     MAIN.appendChild(hpCon);
-    document.getElementById(name).classList.add("bar-container")
-    document.getElementById(name).classList.add("bar")
-    hpBarZ.push(document.getElementById(name))
+    document.getElementById(name).classList.add("bar-container");
+    document.getElementById(name).classList.add("bar");
+    hpBarZ.push(document.getElementById(name));
 
-    const hpA = document.createElement("div")
-    name = "hp" + i + "a"
+    const hpA = document.createElement("div");
+    name = "hp" + i + "a";
     hpA.id = name;
     hpCon.appendChild(hpA);
-    document.getElementById(name).classList.add("fill")
-    hpBarA.push(document.getElementById(name))
+    document.getElementById(name).classList.add("fill");
+    hpBarA.push(document.getElementById(name));
 
-    const hpB = document.createElement("div")
-    name = "hp" + i + "b"
+    const hpB = document.createElement("div");
+    name = "hp" + i + "b";
     hpB.id = name;
     hpCon.appendChild(hpB);
-    document.getElementById(name).classList.add("last")
-    hpBarB.push(document.getElementById(name))
+    document.getElementById(name).classList.add("last");
+    hpBarB.push(document.getElementById(name));
 
-    const hpC = document.createElement("div")
-    name = "hp" + i + "c"
+    const hpC = document.createElement("div");
+    name = "hp" + i + "c";
     hpC.id = name;
     hpCon.appendChild(hpC);
-    document.getElementById(name).classList.add("empty")
-    hpBarC.push(document.getElementById(name))
+    document.getElementById(name).classList.add("empty");
+    hpBarC.push(document.getElementById(name));
 
-    const mpCon = document.createElement("div")
-    name = "mp" + i + "-container"
+    const mpCon = document.createElement("div");
+    name = "mp" + i + "-container";
     mpCon.id = name;
     MAIN.appendChild(mpCon);
-    document.getElementById(name).classList.add("bar-container")
-    document.getElementById(name).classList.add("bar")
-    mpBarZ.push(document.getElementById(name))
+    document.getElementById(name).classList.add("bar-container");
+    document.getElementById(name).classList.add("bar");
+    mpBarZ.push(document.getElementById(name));
 
-    const mpA = document.createElement("div")
-    name = "mp" + i + "a"
+    const mpA = document.createElement("div");
+    name = "mp" + i + "a";
     mpA.id = name;
     mpCon.appendChild(mpA);
-    document.getElementById(name).classList.add("fill")
-    mpBarA.push(document.getElementById(name))
+    document.getElementById(name).classList.add("fill");
+    mpBarA.push(document.getElementById(name));
 
-    const mpB = document.createElement("div")
-    name = "mp" + i + "b"
+    const mpB = document.createElement("div");
+    name = "mp" + i + "b";
     mpB.id = name;
     mpCon.appendChild(mpB);
-    document.getElementById(name).classList.add("empty")
-    mpBarB.push(document.getElementById(name))
+    document.getElementById(name).classList.add("empty");
+    mpBarB.push(document.getElementById(name));
 }
-done = true
+done = true;
 resize();
