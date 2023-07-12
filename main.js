@@ -1,17 +1,13 @@
 "use strict";
-import Alterian_Skyler from "./characters/Alterian Skyler/main.mjs";
-import Delet_Ball from "./characters/Delet Ball/main.mjs";
-import ToFUN_TowerSB from "./characters/ToFUN TowerSB/main.mjs";
-import ToWM_TowerSB from "./characters/ToWM TowerSB/main.mjs";
-
-function getPersonFunc(person, func, ...arg){
-    return peopleObj[person.replace(" ", "_")][func](...arg) // what
-}
 
 let pos = [];
 
 function rand(min, max){
     return Math.random()*(max-min)+min;
+}
+
+function intRand(min, max){
+    return Math.floor(Math.random()*(max-min+1)+min);
 }
 
 function checkElementEffective(attacking, d){
@@ -203,12 +199,14 @@ function checkElementEffective(attacking, d){
             break;
         case "Magical": // dummy for secondary attack types
             break;
+        case "": // no element is considered here
+            break;
         default:
             console.log("unknown element: " + attacking[i]);
             break;
         }
     }
-    if (!(mul == 1)){
+    if (!(mul === 1)){
         console.log((mul > 1 ? 'Super Effective!' : 'Not very effective...'));
         console.log(mul + "x damage...   ELEMENT: " + attacking + " against " + d);
     }
@@ -253,7 +251,7 @@ function allInQueue(){
         if (attempts > 10000){
             throw new Error("Hey! Something went wrong! I can't process this!");
         }
-        if (damageList[i] == "Damage"){
+        if (damageList[i] === "Damage"){
             people[damageList[i+2]].extraInfo[0] = damageList[i+1];
             let damage = Math.random()*100
             let crit = false
@@ -264,7 +262,7 @@ function allInQueue(){
                     break;
                 }
             }
-            if (crit == true){
+            if (crit === true){
                 console.log(critNames[damage] + " Hit!");
                 damage = damageList[i+3] * damageList[i+5][damage];
             } else {
@@ -272,8 +270,8 @@ function allInQueue(){
             }
             damage *= checkElementEffective(damageList[i+7], people[damageList[i+2]].type);
             damage *= rand(1/((damageList[i+6]/100)+1),((damageList[i+6]/100)+1));
-            if (people[damageList[i+1]].sEffects.includes(19) && damageList[i+7].includes("Magical")){damage = damage * 2.5; console.log("Unstable Magic buff!")};
-            if (people[damageList[i+1]].sEffects.includes(21) && damageList[i+7].includes("Magical")){damage = damage * 0.25; console.log("Silenced nerf!")};
+            if (people[damageList[i+1]].sEffects.includes(19) && damageList[i+7].includes("Magical")){damage = damage * 2.5 * allInstEffect(damageList[i+1], 19, 4); console.log("Unstable Magic buff!")};
+            if (people[damageList[i+1]].sEffects.includes(21) && damageList[i+7].includes("Magical")){damage = damage * (0.1 / allInstEffect(damageList[i+1], 21, 4)); console.log("Silenced nerf!")};
             let DMsub = 0;
             if (damageList[i+8] < 1) {DMsub += people[damageList[i+2]].trueDef;};
             let DMdiv = 1;
@@ -285,10 +283,11 @@ function allInQueue(){
             people[damageList[i+2]].hitTimer = 0;
             if (people[damageList[i+2]].health <= 0) console.log("Mortal! [" + format(-1 * people[damageList[i+2]].health, 3, 1000000) + "] HP overkill");
             console.log(format(trueDamage, 3, 1000000) + " damage");
+            peopleObj[damageList[i+2]].hitScript()
             i = i + 9;
         }    
         //damageList.push("Heal", this.name, person, healing, variance, type);
-        if (damageList[i] == "Heal"){
+        if (damageList[i] === "Heal"){
             for (let j = damageList[i+3].length - 1; j >= 0; --j){
                 let healing = damageList[i+3][j] * rand(1/((damageList[i+4]/100)+1),((damageList[i+4]/100)+1))
                 console.log(format(healing, 3, 1000000) + " healing");
@@ -316,7 +315,7 @@ function allInQueue(){
             }
             i = i + 6;
         }    
-        if (damageList[i] == "Effect"){
+        if (damageList[i] === "Effect"){
             let pA = damageList[i+2]; // personAffected
             let effectType = damageList[i+3];
             let duration = damageList[i+4];
@@ -343,6 +342,25 @@ function allInQueue(){
                     case 2:
                         console.log("already has one. nothing changed");
                         break;
+                    case 3: 
+                        people[pA].sDuration[id] += duration;
+                        console.log("effect duration stacked");
+                        break;
+                    case 4: 
+                        people[pA].sStrength[id] += strength;
+                        console.log("effect strength stacked");
+                        break;
+                    case 5: 
+                        people[pA].sDuration[id] += duration;
+                        people[pA].sStrength[id] += strength;
+                        console.log("effect stats stacked");
+                        break;
+                    case 6: 
+                        people[pA].sEffects.push(effectType);
+                        people[pA].sDuration.push(duration);
+                        people[pA].sStrength.push(strength);
+                        console.log("effect stats stacked...");
+                        break;
                     default:
                         throw new Error("What do you want me to do here?? " + people[pA].name + " already has the effect " + effectList[effectType]) + ", but you are not clear what you want me to do! (Type: " + damageList[i+6] + ")";
                 }
@@ -363,10 +381,10 @@ function clamp(num, min, max){ // why isn't this built in
 
 function lerp(t, s, e, type, p){
     t = clamp(t, 0, 1);
-    if (t == 0){
+    if (t === 0){
         return s;
     }
-    if (t == 1){
+    if (t === 1){
         return e;
     }
     switch(type) {
@@ -405,9 +423,6 @@ function lerp(t, s, e, type, p){
 }
 
 function newMusic(m){
-    if (m >= music.length){
-        throw new Error('Hey! That song is out of bounds! ' + m);
-    }
     for (let i = 0; i < music.length; ++i){
         music[i].load();
     }
@@ -482,13 +497,17 @@ function changeAtt(spriteID, left, top, width, height, bgColor, src){
 }
 
 function updateLastHP(){
+    let hp
+    let mhp
     for (let i = 0; i < peopleNames.length; ++i){
+        hp = people[peopleNames[i]].health
+        mhp = people[peopleNames[i]].maxHealth
         people[peopleNames[i]].hitTimer = people[peopleNames[i]].hitTimer + delta;
         if (people[peopleNames[i]].hitTimer >= 1){
-            if (lastHP[i] - people[peopleNames[i]].health > people[peopleNames[i]].maxHealth * delta * 0.25){
-                lastHP[i] = lastHP[i] + people[peopleNames[i]].maxHealth * delta * 0.25 * ((lastHP[i] > people[peopleNames[i]].health) ? -1 : 1);
+            if ((lastHP[i] - hp) > (mhp * delta * 0.25)){
+                lastHP[i] += mhp * delta * 0.25 * ((lastHP[i] > hp) ? -1 : 1);
             } else {
-                lastHP[i] = people[peopleNames[i]].health;
+                lastHP[i] = hp;
             }
         }
     }
@@ -555,24 +574,19 @@ function translateXY(x,y,xs,ys){
     ];
 }
 
-jQuery(function () {
-    window.requestAnimationFrame(gameLoop);
+window.addEventListener('load', function() {
     let oldTimeStamp = 0; 
 
-    peopleObj = {
-        Alterian_Skyler,
-        Delet_Ball,
-        ToFUN_TowerSB,
-        ToWM_TowerSB,
-    }
-    
     for (let i = 0; i < peopleNames.length; i++){
-        getPersonFunc(peopleNames[i], "introduction")
-        getPersonFunc(peopleNames[i], "target", ["normal", "normal"])
+        console.log(i + "   -   " + peopleNames[i])
+        peopleObj[peopleNames[i]].init()
+        peopleObj[peopleNames[i]].defaultAct.introduction()
     }
 
+    window.requestAnimationFrame(gameLoop);
+
     function gameLoop(timeStamp){
-        if (done === false) {console.log("not done!"); window.requestAnimationFrame(gameLoop); return;}
+        if (done === false) {window.requestAnimationFrame(gameLoop); return;}
         delta = ((timeStamp - oldTimeStamp) / 1000) * TimeSpeed;
         const FPS = Math.round(TimeSpeed / delta);
         Time = Time + delta;
@@ -586,18 +600,18 @@ jQuery(function () {
         }
         if (Time > lastTurn){
             let alive = checkForAlive();
-            if (alive[2].length == 0){currentState.ended = Infinity;} // a tie, but everyone is knocked out smh
-            if (alive[2].length == 1){currentState.ended = alive[2][0];} // winning team
-            if (currentState.ended == 0){
+            if (alive[2].length === 0){currentState.ended = Infinity;} // a tie, but everyone is knocked out smh
+            if (alive[2].length === 1){currentState.ended = alive[2][0];} // winning team
+            if (currentState.ended === 0){
                 getTurnOrder(alive[0], alive[1]);
                 console.log(turnOrder[turnID].name + "'s turn!");
                 try {
-                    getPersonFunc(turnOrder[turnID].name, "doTurn")
+                    peopleObj[peopleNames[turnID]].doTurn()
                 } catch (e) {
                     console.info("Next person (" + turnOrder[turnID].name + ") died before they could get their turn!")
                     turnID = 0;
                     turnSeq++;
-                    getPersonFunc(turnOrder[turnID].name, "doTurn")
+                    peopleObj[peopleNames[turnID]].doTurn()
                 }
                 turnID++;
                 if (turnID >= alive[1]){
@@ -622,6 +636,7 @@ function comboSFX(amt, pow){
 
 function start(){
     newMusic(musicState);
+    done = true;
 }
 
 function checkForAlive(){
@@ -641,6 +656,9 @@ function checkForAlive(){
 }
 
 function getTurnOrder(list, len){
+    for (let i = 0; i < peopleNames.length; ++i){
+        people[peopleNames[i]].updateSTATEffects()
+    }
     turnOrder = [];
     for (let i = 0; i < len; ++i){
         turnOrder.push(list[i]);

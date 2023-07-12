@@ -20,46 +20,8 @@ function resize(){
     */
 }
 
-function newPersonAttributes(person){
-    let temp
-    temp = {
-        name: person.name,
-        introduction() {
-            console.log("hi!! i am " + person.name + " and i think i'm supposed to be initalizing quickly... good luck!")
-        },
-        target(ieType) {
-            let temp
-            let candidates = people
-            let candidatesNames = peopleNames
-            console.log(candidates)
-            if (ieType[1] !== "includeDead") {
-                for (let i = 0; i < candidatesNames.length; ++i){
-                    if (candidates[candidatesNames[i]].alive == false) {
-                        console.info(candidatesNames[i] + " is dead")
-                        delete candidates[i]
-                        candidatesNames = candidatesNames.splice(i, 1)
-                    }
-                }
-            }
-            console.log(candidates)
-            switch (ieType[0]){
-                case "self":
-                    return person.name
-                case "normal":
 
-                    break;
-                default:
-                    console.warn("no, " + ieType[0] + " does not exist.")
-            }
-        },
-        doTurn() {
-            console.log(person.name + " said to die!")
-        },
-    }
-    return temp
-}
 
-let peopleObj = {};
 let CamX = 0;
 let CamY = 0;
 let Zoom = 1;
@@ -77,7 +39,11 @@ let sfxVolume = 0.30;
 let typeVerify = true; // checks if any of the elements in the type effectiveness calculator is correct
 let done = false
 const effectList = ["Burn", "Poison", "Sunstroke", "Paralyze", "Sleep", "Freeze", "Confusion", "Strange", "Crying", "Ichor", "Ironskin", "Light Shield", "Revitalize", "Energize", "Dazed", "Focus", "Taunt", "Slow", "Fast", "Unstable Magic", "Bad Poison", "Silence", "Strong", "Weak"];
-const music = [new Audio('music/forget not (shortened).mp3'), new Audio('music/something with danidanijr V3.6 NO ARTS.mp3')];
+const music = [
+    new Audio('music/forget not (shortened).mp3'), 
+    new Audio('music/something with danidanijr V3.6 NO ARTS.mp3'),
+    new Audio('music/Kanakana Shigure.mp3')
+];
 const critNames = ["Critical", "Deadly", "Super", "Ultra", "Hyper", "EXTREME", "ULTIMATE", "HOLY"];
 const elementList = ["Normal", "Water", "Fire", "Grass", "Electric", "Ice", "Air", "Dark", "Light", "Earth", "Fighting", "Poison", "Insect", "Rock", "Metal", "Spirit", "Psychic", "Dragon", "Mystic", "Sound", "Crystal", "Mech", "Time", "Chemical", "Explosive", "Magic", "Plasma", "Volcanic", "Glass", "Virus", "Cyber", "Celestial", "Cosmic", "Magnetic", "Spectra", "Wood", "Soul", "Shadow", "Nuclear", "Ancient"]
 
@@ -88,16 +54,28 @@ for (let i = 1; i <= 16; ++i){
     comboSound.push(new Audio('sfx/combo_' + i + '_power.mp3'));
 }*/
 
-/*const sfxMP3 = [];
+const sfxMP3 = [];
 for (let i = 0; i < 1; ++i){
     sfxMP3.push(new Audio('sfx/sfx' + i + '.mp3'));
-}*/
+}
+/*
+sfx0.mp3 = roblox banana
+sfx1.mp3 = pokemon poison 
+sfx2.mp3 = roblox coil
 
-/*const sfxWAV = [];
+*/
+const sfxWAV = [];
 for (let i = 0; i < 3; ++i){
     sfxWAV.push(new Audio('sfx/sfx' + i + '.wav'));
-}*/
+}
+/*
+sfx0.wav = kirby hit
+sfx1.wav = super punch
+sfx2.wav = extended hit
+sfx3.wav = hit slowdown
+sfx4.wav = charging
 
+*/
 let musicState = 0;
 let musicUpdate = 0;
 let peopleNames = [];
@@ -117,6 +95,39 @@ let currentState = {
 
 for (let i = 0; i < music.length; ++i){
     music[i].loop = true;
+}
+
+function allInstEffect(person, id, type) { // gets all Instances of effects
+    let k = (type === 5) ? 1 : 0
+    for (let i = 0; i < people[person].sEffects.length; ++i){
+        if (people[person].sEffects[i] === id) {
+            switch(type){
+                case 0:
+                    k++;
+                    break;
+                case 1:
+                    k += (people[person].sDuration[i] * people[person].sStrength[i] / people[person].maxHealth);
+                    break;
+                case 2:
+                    k += ((people[person].sDuration[i] ** 2) * people[person].sStrength[i] / people[person].maxHealth);
+                    break;
+                case 3:
+                    k += ((1 - (1 / (people[person].sDuration[i] + 1))) / people[person].sStrength[i]);
+                    break;
+                case 4:
+                    k += ((1 - (1 / (people[person].sDuration[i] + 1))) * people[person].sStrength[i]);
+                    break;
+                case 5:
+                    k *= people[person].sStrength[i];
+                    break;
+                default:
+                    throw new Error(`no. id ${type}`)
+            }
+        }
+    }
+    if (type === 5) {k--;}
+    console.log(`Matches: ${k} with effect ${effectList[id]} (ID ${id}) with type ${type}`)
+    return k
 }
 
 class Character {
@@ -152,7 +163,7 @@ class Character {
         this.sDuration = [];
         this.sStrength = [];
         this.spriteState = "Idle1";
-        this.extraInfo = ["", ""] // who hit me?, who healed me?
+        this.extraInfo = []
         this.sizeX = sizeX;
         this.sizeY = sizeY;
         this.SuperPower = 0;
@@ -173,7 +184,7 @@ class Character {
         this.flip = [false, false] // [0] = horizontal flip, [1] = vertical flip
         lastHP.push(this.health);
         peopleNames.push(this.name);
-        this.alive = true
+        this.alive = true;
     }
 
     updateSTATEffects(){
@@ -182,34 +193,53 @@ class Character {
         // "Fast", "Unstable Magic", "Bad Poison", "Silence", "Strong", "Weak"];
         let mod;
         mod = 1;
-        if (this.sEffects.includes(16)) {mod *= 1.667;}
-        if (this.sEffects.includes(21)) {mod *= 1.75;}
-        if (this.sEffects.includes(22)) {mod *= 0.6;}
+        // if (this.sEffects.includes(16)) {mod *= 1.667;}
+        // if (this.sEffects.includes(21)) {mod *= 1.75;}
+        // if (this.sEffects.includes(22)) {mod *= 0.6;}
+        mod *= 1 + (allInstEffect(this.name, 16, 5) * 0.667);
+        mod *= 1 + (allInstEffect(this.name, 21, 5) * 0.75);
+        mod /= 1 + (allInstEffect(this.name, 22, 5) * 0.667);
         this.trueAtk = this.atk * mod;
         mod = 1;
-        if (this.sEffects.includes(9)) {mod *= 0.6;}
-        if (this.sEffects.includes(10)) {mod *= 1.333;}
-        if (this.sEffects.includes(16)) {mod /= 1.667;}
+        // if (this.sEffects.includes(9)) {mod *= 0.6;}
+        // if (this.sEffects.includes(10)) {mod *= 1.333;}
+        // if (this.sEffects.includes(16)) {mod *= 0.6;}
+        mod /= 1 + (allInstEffect(this.name, 9, 5) * 0.667);
+        mod *= 1 + (allInstEffect(this.name, 10, 5) * 0.333);
+        mod /= 1 + (allInstEffect(this.name, 16, 5) * 0.667);
         this.trueDef = this.def * mod;
         mod = 1;
-        if (this.sEffects.includes(9)) {mod *= 0.75;}
-        if (this.sEffects.includes(10)) {mod *= 1.5;}
-        if (this.sEffects.includes(11)) {mod *= 1.667;}
-        if (this.sEffects.includes(16)) {mod *= 0.8;}
+        // if (this.sEffects.includes(9)) {mod *= 0.75;}
+        // if (this.sEffects.includes(10)) {mod *= 1.5;}
+        // if (this.sEffects.includes(11)) {mod *= 1.667;}
+        // if (this.sEffects.includes(16)) {mod *= 0.8;}
+        mod /= 1 + (allInstEffect(this.name, 9, 5) * 0.333);
+        mod *= 1 + (allInstEffect(this.name, 10, 5) * 0.5);
+        mod *= 1 + (allInstEffect(this.name, 11, 5) * 0.667);
+        mod /= 1 + (allInstEffect(this.name, 16, 5) * 0.25);
         this.trueDDef = mod;
         mod = 1;
-        if (this.HPtype == "NC") {mod /= 2;}
+        if (this.HPtype === "NC") {mod /= 2;}
         this.truePDef = mod;
         mod = rand(0.8, 1.2);
-        if (this.sEffects.includes(3)) {mod *= 0.7;}
-        if (this.sEffects.includes(4)) {mod *= 0.1;}
-        if (this.sEffects.includes(5)) {mod *= 0.1;}
-        if (this.sEffects.includes(6)) {mod *= 0.7;}
-        if (this.sEffects.includes(14)) {mod *= 0.5;}
-        if (this.sEffects.includes(15)) {mod *= 1.5;}
-        if (this.sEffects.includes(17)) {mod *= 0.667;}
-        if (this.sEffects.includes(18)) {mod *= 1.5;}
-        if (this.sEffects.includes(20)) {mod *= 0.5;}
+        // if (this.sEffects.includes(3)) {mod *= 0.7;}
+        // if (this.sEffects.includes(4)) {mod *= 0.1;}
+        // if (this.sEffects.includes(5)) {mod *= 0.1;}
+        // if (this.sEffects.includes(6)) {mod *= 0.7;}
+        // if (this.sEffects.includes(14)) {mod *= 0.5;}
+        // if (this.sEffects.includes(15)) {mod *= 1.5;}
+        // if (this.sEffects.includes(17)) {mod *= 0.667;}
+        // if (this.sEffects.includes(18)) {mod *= 1.5;}
+        // if (this.sEffects.includes(20)) {mod *= 0.5;}
+        mod /= 1 + (allInstEffect(this.name, 3, 5) * 0.333);
+        mod /= 1 + (allInstEffect(this.name, 4, 5) * 9);
+        mod /= 1 + (allInstEffect(this.name, 5, 5) * 9);
+        mod /= 1 + (allInstEffect(this.name, 6, 5) * 0.333);
+        mod /= 1 + (allInstEffect(this.name, 14, 5) * 1);
+        mod *= 1 + (allInstEffect(this.name, 15, 5) * 0.5);
+        mod /= 1 + (allInstEffect(this.name, 17, 5) * 0.5);
+        mod *= 1 + (allInstEffect(this.name, 18, 5) * 0.5);
+        mod /= 1 + (allInstEffect(this.name, 20, 5) * 1);
         this.trueSpd = this.spd * mod;
     }
 
@@ -230,6 +260,12 @@ class Character {
                 case 2: 
                     this.damage(this.name, this.sStrength[i], [0], [1], 10, ["Normal", "Physical"], 1); 
                     allInQueue();
+                    break;
+                case 4: 
+                    if (this.sStrength[i] >= 1){
+                        this.heal(this.name, [this.maxHealth * this.sStrength[i] / 40], 10, ["Normal", "Physical"]); 
+                        allInQueue();
+                    }
                     break;
                 case 12: 
                     this.heal(this.name, [this.sStrength[i]], 10, ["Normal", "Physical"]); 
@@ -298,15 +334,16 @@ for (let i = 0; i < music.length; ++i){
 }
 
 let people = {
-    //                                                    Lv  XPos  YPos  S  HPX HPY HPS XPR XPS BaseHP  BaseMP Type(s)                 BATK    BDEF   BSD HPType     PersonType   T  Xs   Ys
-    //"Alterian Skyler": new Character("Alterian Skyler", 70,  0,    0,   1, -5, 120, 1, 45,  0, 47,     11,    ["Normal", "Electric"], 35,     8.2,   22, "NC",     "PlayerBoss", 0, 128, 256),
-    //"ToWM TowerSB":    new Character("ToWM TowerSB",    70, -200, -100, 1, -5, 110, 1, 35,  0, 55,     10,    ["Normal"],             25,     10,    16, "Normal", "Player",     1, 128, 256),
-    //"ToFUN TowerSB":   new Character("ToFUN TowerSB",   70, -125, -125, 1, -5, 120, 1, 40,  0, 50,     16,    ["Normal"],             40,     20,    10, "Normal", "Player",     1, 128, 256),
-    //"Delet Ball":      new Character("Delet Ball",      1,   200, -100, 1, -5, 60,  1, 1e7, 0, 310096, 19886, ["Dark"],               153031, 25084, 31, "Normal", "Boss",       2, 128, 128),
-      "Alterian Skyler": new Character("Alterian Skyler", 1,   0,    0,   1, -5, 120, 1, 45,  0, 47,     11,    ["Normal", "Electric"], 35,     8.2,   22, "NC",     "PlayerBoss", 0, 128, 256),
-      "ToWM TowerSB":    new Character("ToWM TowerSB",    1,  -200, -100, 1, -5, 110, 1, 35,  0, 55,     10,    ["Normal"],             25,     10,    16, "Normal", "Player",     0, 128, 256),
-      "ToFUN TowerSB":   new Character("ToFUN TowerSB",   1,  -125, -125, 1, -5, 120, 1, 40,  0, 50,     16,    ["Normal"],             40,     20,    10, "Normal", "Player",     0, 128, 256),
-      "Delet Ball":      new Character("Delet Ball",      1,   200, -100, 1, -5, 60,  1, 1e7, 0, 10000,  1000,  ["Dark"],               16,     0,     19, "Normal", "Boss",       1, 128, 128),
+       //                                                      Lv   XPos  YPos S  HPX HPY HPS XPR XPS BaseHP  BaseMP Type(s)                 BATK    BDEF   BSD HPType     PersonType   T  Xs   Ys
+        // "Alterian Skyler": new Character("Alterian Skyler", 70,  0,    0,   1, -5, 120, 1, 45,  0, 47,     11,    ["Normal", "Electric"], 3,      0,     22, "Normal", "PlayerBoss", 0, 128, 256),
+        // "ToWM TowerSB":    new Character("ToWM TowerSB",    70, -200, -100, 1, -5, 110, 1, 35,  0, 55,     10,    ["Normal"],             5,      1,     16, "Normal", "Player",     1, 128, 256),
+        // "ToFUN TowerSB":   new Character("ToFUN TowerSB",   70, -125, -125, 1, -5, 120, 1, 40,  0, 50,     16,    ["Normal"],             4,      2,     10, "Normal", "Player",     1, 128, 256),
+        // "Delet Ball":      new Character("Delet Ball",      1,   200, -100, 1, -5, 60,  1, 1e7, 0, 310096, 19886, ["Dark"],               13031,  1654,  31, "Normal", "Boss",       2, 128, 128),
+           "Alterian Skyler": new Character("Alterian Skyler", 1,   0,    0,   1, -5, 120, 1, 45,  0, 47,     11,    ["Normal", "Electric"], 3,      0,     22, "Normal", "Player",     0, 128, 256),
+           "ToWM TowerSB":    new Character("ToWM TowerSB",    1,  -200, -100, 1, -5, 110, 1, 35,  0, 55,     10,    ["Normal"],             5,      1,     16, "Normal", "Player",     0, 128, 256),
+           "ToFUN TowerSB":   new Character("ToFUN TowerSB",   1,  -125, -125, 1, -5, 120, 1, 40,  0, 50,     16,    ["Normal"],             4,      2,     10, "Normal", "Player",     0, 128, 256),
+           "FSBlue":          new Character("FSBlue",          1,  -175, -175, 1, -5, 120, 1, 67,  0, 80,     4,     ["Normal", "Fighting"], 9,      3.5,   18, "Normal", "Player",     0, 128, 256),
+           "Delet Ball":      new Character("Delet Ball",      1,   200, -100, 1, -5, 60,  1, 1e7, 0, 10000,  1000,  ["Dark"],               16,     0,     19, "Normal", "Boss",       1, 128, 128),
 }
 
 let characters = [];
@@ -317,6 +354,7 @@ let hpBarC = [];
 let mpBarZ = [];
 let mpBarA = [];
 let mpBarB = [];
+
 for (let i = 0; i < peopleNames.length; i++){
     let name = "character" + i;
     const char = document.createElement("img");
@@ -378,5 +416,5 @@ for (let i = 0; i < peopleNames.length; i++){
     document.getElementById(name).classList.add("empty");
     mpBarB.push(document.getElementById(name));
 }
-done = true;
+
 resize();
