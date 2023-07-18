@@ -1,0 +1,41 @@
+{
+    "Alterian Skyler": {
+        "hpBars": 3,
+        "blood": true,
+        "hpBarColor": ["default", "#00ffff", "#00acff", "#0000ff"],
+        "description": "Alterian Skyler is a cyan colored humanoid person, which is also cat-like. Their full name is \"Alterian Yeafron Skyler\", although they are more generally known as \"Kyron Yeafron Skyler\" due to phase changes that relate with names. They are a member of the SB (Squary Boi) species. Their birthday is October 21, 2018. They have many phases, that all include different elements and slightly different behaviors."
+    },
+    "ToWM TowerSB": {
+        "hpBars": 1,
+        "blood": true,
+        "hpBarColor": "default",
+        "description": "ToWM:TowerSB is a watermelon-like humanoid person that came from a tower from JToH, and he is a semi-canonical member of the SB (Squary Boi) species. He typically attacks using instakills but these instakillbricks are nerfed. (Who (creators) would want to use real IKBs anyway?)"
+    },
+    "ToFUN TowerSB": {
+        "hpBars": 1,
+        "blood": false,
+        "naturalCounter": {
+            "physical": true,
+            "magical": false,
+            "damage": {
+                "fromDamageReceived": 0.10,
+                "fromATK": 0.15,
+                "effects": [[23, 0.90, 0.4], [1, 0.20, 1.5]]
+            }
+        },
+        "hpBarColor": "default",
+        "description": "ToFUN:TowerSB is a blue-cyan white gradient humanoid person that came from a tower that TearonQ made, relating to JToH. She is another semi-canonical member of the SB (Squary Boi) species. Her attacks involve sharp weapons, and even touching her would cut you badly."
+    },
+    "FSBlue": {
+        "hpBars": 1,
+        "blood": false,
+        "hpBarColor": "default",
+        "description": "FSBlue is a blue furry fox-like character that wants many friends. She is a member of the SB (Squary Boi) species. She was made by a different person, but then defected over to TearonQ in 2019. She is also a transfem, transitioning in 2021."
+    },
+    "Delet Ball": {
+        "hpBars": 8,
+        "blood": false,
+        "hpBarColor": ["default", "#8a0000", "#ff0000", "#ff00a6", "#ff4800", "#ff4800", "#f725db", "#d9ba30", "#eb634b"],
+        "description": "Delet Ball is a weird-ass lookin' goofy ahh motherfucker that likes deleting people. What the fuck is this character. I found him all the way back in 2015 and something else happened, idk"
+    }
+}

@@ -1,4 +1,5 @@
 "use strict";
+
 let canvasSize = {width: 0, height: 0};
 
 window.addEventListener('resize', resize);
@@ -20,8 +21,6 @@ function resize(){
     */
 }
 
-
-
 let CamX = 0;
 let CamY = 0;
 let Zoom = 1;
@@ -38,7 +37,7 @@ let musicVolume = 1.00;
 let sfxVolume = 0.30;
 let typeVerify = true; // checks if any of the elements in the type effectiveness calculator is correct
 let done = false
-const effectList = ["Burn", "Poison", "Sunstroke", "Paralyze", "Sleep", "Freeze", "Confusion", "Strange", "Crying", "Ichor", "Ironskin", "Light Shield", "Revitalize", "Energize", "Dazed", "Focus", "Taunt", "Slow", "Fast", "Unstable Magic", "Bad Poison", "Silence", "Strong", "Weak"];
+const effectList = ["Burn", "Poison", "Sunstroke", "Paralyze", "Sleep", "Freeze", "Confusion", "Strange", "Crying", "Ichor", "Ironskin", "Light Shield", "Revitalize", "Energize", "Dazed", "Focus", "Taunt", "Slow", "Fast", "Unstable Magic", "Bad Poison", "Silence", "Strong", "Weak", "Bleed"];
 const music = [
     new Audio('music/forget not (shortened).mp3'), 
     new Audio('music/something with danidanijr V3.6 NO ARTS.mp3'),
@@ -76,11 +75,12 @@ sfx3.wav = hit slowdown
 sfx4.wav = charging
 
 */
-let musicState = 0;
+let musicState = 1;
 let musicUpdate = 0;
 let peopleNames = [];
 let turnOrder = [];
 let lastHP = [];
+let lastHP2 = [];
 let shakeRandomListX = [0, 1];
 let shakeRandomListY = [0, 1];
 let shakeRandomInterval = 0;
@@ -98,7 +98,7 @@ for (let i = 0; i < music.length; ++i){
 }
 
 function allInstEffect(person, id, type) { // gets all Instances of effects
-    let k = (type === 5) ? 1 : 0
+    let k = (type === 5 || type === 4) ? 1 : 0
     for (let i = 0; i < people[person].sEffects.length; ++i){
         if (people[person].sEffects[i] === id) {
             switch(type){
@@ -106,16 +106,16 @@ function allInstEffect(person, id, type) { // gets all Instances of effects
                     k++;
                     break;
                 case 1:
-                    k += (people[person].sDuration[i] * people[person].sStrength[i] / people[person].maxHealth);
+                    k += (people[person].sDuration[i] * people[person].sStrength[i] / people[person].maxHealth); // >1.00 if the effect will kill them 
                     break;
                 case 2:
-                    k += ((people[person].sDuration[i] ** 2) * people[person].sStrength[i] / people[person].maxHealth);
+                    k += ((people[person].sDuration[i] ** 2) * people[person].sStrength[i] / people[person].maxHealth); // bad poison
                     break;
                 case 3:
-                    k += ((1 - (1 / (people[person].sDuration[i] + 1))) / people[person].sStrength[i]);
+                    k += ((1 - (1 / (people[person].sDuration[i] + 1))) / people[person].sStrength[i]);// no
                     break;
                 case 4:
-                    k += ((1 - (1 / (people[person].sDuration[i] + 1))) * people[person].sStrength[i]);
+                    k *= ((1 - (1 / (people[person].sDuration[i] + 1))) * (1 + people[person].sStrength[i]));
                     break;
                 case 5:
                     k *= people[person].sStrength[i];
@@ -125,8 +125,7 @@ function allInstEffect(person, id, type) { // gets all Instances of effects
             }
         }
     }
-    if (type === 5) {k--;}
-    console.log(`Matches: ${k} with effect ${effectList[id]} (ID ${id}) with type ${type}`)
+    if (type === 5 || type === 4) {k--;}
     return k
 }
 
@@ -134,7 +133,8 @@ class Character {
     constructor(name, lvl, XPos, YPos, size, XOffsetHP, YOffsetHP, SizeOffsetHP, baseXPReq, xp, baseHP, baseMP, elem, baseATK, baseDEF, baseSPD, hpType, personType, team, sizeX, sizeY){
         this.name = name;
         let lf = lvl - 1;
-        lf = (((lf + ((lf ** 2) / 15) + ((lf ** 3) / 120)) ** (1 + (lf / 250))) + 8) / 8;
+        //lf = (((lf + ((lf ** 2) / 15) + ((lf ** 3) / 120)) ** (1 + (lf / 240))) + 8) / 8;
+        lf = ((lf + ((lf ** 2) / 15)) + 8) / 8;
         this.level = lvl;
         this.xPosition = XPos;
         this.yPosition = YPos;
@@ -163,7 +163,7 @@ class Character {
         this.sDuration = [];
         this.sStrength = [];
         this.spriteState = "Idle1";
-        this.extraInfo = []
+        this.extraInfo = [{}] // first item must ALWAYS be an object for customization
         this.sizeX = sizeX;
         this.sizeY = sizeY;
         this.SuperPower = 0;
@@ -183,8 +183,13 @@ class Character {
         this.grayScale = 0.00;
         this.flip = [false, false] // [0] = horizontal flip, [1] = vertical flip
         lastHP.push(this.health);
+        lastHP2.push(this.health);
         peopleNames.push(this.name);
         this.alive = true;
+        this.effModifier = {};
+        this.extraVar = {
+            "hit": undefined
+        };
     }
 
     updateSTATEffects(){
@@ -334,16 +339,16 @@ for (let i = 0; i < music.length; ++i){
 }
 
 let people = {
-       //                                                      Lv   XPos  YPos S  HPX HPY HPS XPR XPS BaseHP  BaseMP Type(s)                 BATK    BDEF   BSD HPType     PersonType   T  Xs   Ys
-        // "Alterian Skyler": new Character("Alterian Skyler", 70,  0,    0,   1, -5, 120, 1, 45,  0, 47,     11,    ["Normal", "Electric"], 3,      0,     22, "Normal", "PlayerBoss", 0, 128, 256),
-        // "ToWM TowerSB":    new Character("ToWM TowerSB",    70, -200, -100, 1, -5, 110, 1, 35,  0, 55,     10,    ["Normal"],             5,      1,     16, "Normal", "Player",     1, 128, 256),
-        // "ToFUN TowerSB":   new Character("ToFUN TowerSB",   70, -125, -125, 1, -5, 120, 1, 40,  0, 50,     16,    ["Normal"],             4,      2,     10, "Normal", "Player",     1, 128, 256),
-        // "Delet Ball":      new Character("Delet Ball",      1,   200, -100, 1, -5, 60,  1, 1e7, 0, 310096, 19886, ["Dark"],               13031,  1654,  31, "Normal", "Boss",       2, 128, 128),
-           "Alterian Skyler": new Character("Alterian Skyler", 1,   0,    0,   1, -5, 120, 1, 45,  0, 47,     11,    ["Normal", "Electric"], 3,      0,     22, "Normal", "Player",     0, 128, 256),
-           "ToWM TowerSB":    new Character("ToWM TowerSB",    1,  -200, -100, 1, -5, 110, 1, 35,  0, 55,     10,    ["Normal"],             5,      1,     16, "Normal", "Player",     0, 128, 256),
-           "ToFUN TowerSB":   new Character("ToFUN TowerSB",   1,  -125, -125, 1, -5, 120, 1, 40,  0, 50,     16,    ["Normal"],             4,      2,     10, "Normal", "Player",     0, 128, 256),
-           "FSBlue":          new Character("FSBlue",          1,  -175, -175, 1, -5, 120, 1, 67,  0, 80,     4,     ["Normal", "Fighting"], 9,      3.5,   18, "Normal", "Player",     0, 128, 256),
-           "Delet Ball":      new Character("Delet Ball",      1,   200, -100, 1, -5, 60,  1, 1e7, 0, 10000,  1000,  ["Dark"],               16,     0,     19, "Normal", "Boss",       1, 128, 128),
+       //                                                      Lv   XPos  YPos  Size  HPX HPY HPS   XPR XPS BaseHP  BaseMP Type(s)                 BATK    BDEF   BSpd  HPType     PersonType   Team  Xscale Yscale
+        // "Alterian Skyler": new Character("Alterian Skyler", 70,  0,    0,    1,   -5,  120, 1,   45,  0, 47,     11,    ["Normal", "Electric"], 3,      0,     22,   "Normal", "PlayerBoss", 0,    128,   256),
+        // "ToWM TowerSB":    new Character("ToWM TowerSB",    70, -200, -100,  1,   -5,  110, 1,   35,  0, 55,     10,    ["Normal"],             5,      1,     16,   "Normal", "Player",     1,    128,   256),
+        // "ToFUN TowerSB":   new Character("ToFUN TowerSB",   70, -125, -125,  1,   -5,  120, 1,   40,  0, 50,     16,    ["Normal"],             4,      2,     10,   "Normal", "Player",     1,    128,   256),
+        // "Delet Ball":      new Character("Delet Ball",      1,   200, -100,  1,   -5,  60,  1,   1e7, 0, 310096, 19886, ["Dark"],               13031,  1654,  31,   "Normal", "Boss",       2,    128,   128),
+           "Alterian Skyler": new Character("Alterian Skyler", 1,   150,  150,  1,   -5,  120, 1,   45,  0, 47,     11,    ["Normal", "Electric"], 3,      0,     22,   "Normal", "Player",     0,    128,   256),
+           "ToWM TowerSB":    new Character("ToWM TowerSB",    1,  -200, -100,  1,   -5,  110, 1,   35,  0, 55,     10,    ["Normal"],             5,      1,     16,   "Normal", "Player",     0,    128,   256),
+           "ToFUN TowerSB":   new Character("ToFUN TowerSB",   1,  -125, -125,  1,   -5,  120, 1,   40,  0, 50,     16,    ["Normal"],             4,      2,     10,   "Normal", "Player",     0,    128,   256),
+           "FSBlue":          new Character("FSBlue",          1,  -150,  150,  4/3, -5,  90,  3/4, 67,  0, 80,     4,     ["Normal", "Fighting"], 9,      3.5,   18,   "Normal", "Player",     0,    128,   256),
+           "Delet Ball":      new Character("Delet Ball",      1,   200, -100,  1,   -5,  60,  1,   1e7, 0, 100,    160,   ["Dark"],               16,     0,     19,   "Normal", "Boss",       1,    128,   128),
 }
 
 let characters = [];
@@ -351,6 +356,7 @@ let hpBarZ = [];
 let hpBarA = [];
 let hpBarB = [];
 let hpBarC = [];
+let hpBarD = [];
 let mpBarZ = [];
 let mpBarA = [];
 let mpBarB = [];
@@ -386,6 +392,13 @@ for (let i = 0; i < peopleNames.length; i++){
     hpCon.appendChild(hpB);
     document.getElementById(name).classList.add("last");
     hpBarB.push(document.getElementById(name));
+
+    const hpD = document.createElement("div");
+    name = "hp" + i + "d";
+    hpD.id = name;
+    hpCon.appendChild(hpD);
+    document.getElementById(name).classList.add("last");
+    hpBarD.push(document.getElementById(name));
 
     const hpC = document.createElement("div");
     name = "hp" + i + "c";

@@ -16,194 +16,194 @@ function checkElementEffective(attacking, d){
     let mul = 1;
     for (let i = 0; i < attacking.length; ++i){
         switch(attacking[i]){
-        case "Normal": 
-            mul *= dEC(0.5, d, ["Rock", "Metal", "Crystal", "Mech", "Chemical", "Volcanic", "Virus"]);
-            mul *= dEC(0, d, ["Spirit", "Soul"]);
-            break;
-        case "Water": 
-            mul *= dEC(2, d, ["Fire", "Earth", "Rock", "Volcanic", "Cyber", "Magnetic", "Spectra"]);
-            mul *= dEC(0.5, d, ["Water", "Grass", "Air", "Dragon", "Chemical", "Plasma", "Glass", "Celestial", "Wood", "Nuclear", "Ancient"]);
-            break;
-        case "Fire": 
-            mul *= dEC(2, d, ["Grass", "Ice", "Air", "Insect", "Metal", "Explosive", "Virus", "Wood", "Shadow", "Nuclear"]);
-            mul *= dEC(0.5, d, ["Water", "Fire", "Light", "Rock", "Dragon", "Mystic", "Volcanic", "Glass", "Ancient"]);
-            mul *= dEC(0, d, ["Crystal"]);
-            break;
-        case "Grass": 
-            mul *= dEC(2, d, ["Water", "Earth", "Rock", "Crystal"]);
-            mul *= dEC(0.5, d, ["Fire", "Grass", "Air", "Poison", "Insect", "Metal", "Dragon", "Mystic", "Plasma", "Glass", "Virus", "Cyber"]);
-            break;
-        case "Electric": 
-            mul *= dEC(2, d, ["Water", "Crystal", "Time", "Virus", "Cyber", "Magnetic"]);
-            mul *= dEC(0.5, d, ["Grass", "Electric", "Light", "Dragon", "Plasma", "Glass", "Wood", "Soul"]);
-            mul *= dEC(0, d, ["Earth"]);
-            break;
-        case "Ice": 
-            mul *= dEC(2, d, ["Grass", "Air", "Earth", "Dragon", "Time", "Volcanic", "Virus", "Soul", "Shadow", "Nuclear"]);
-            mul *= dEC(0.5, d, ["Water", "Fire", "Ice", "Metal", "Explosive", "Plasma", "Ancient"]);
-            break;
-        case "Air": 
-            mul *= dEC(2, d, ["Grass", "Earth", "Fighting", "Insect", "Explosive"]);
-            mul *= dEC(0.5, d, ["Water", "Air", "Rock", "Metal", "Psychic", "Mech", "Magic", "Volcanic", "Cosmic", "Wood", "Soul"]);
-            mul *= dEC(0, d, ["Chemical"]);
-            break;
-        case "Dark": 
-            mul *= dEC(2, d, ["Light", "Spirit", "Psychic", "Crystal", "Magic", "Glass", "Soul"]);
-            mul *= dEC(0.5, d, ["Dark", "Fighting", "Mystic", "Virus", "Spectra", "Shadow"]);
-            break;
-        case "Light": 
-            mul *= dEC(2, d, ["Dark", "Magic", "Soul", "Shadow", "Ancient"]);
-            mul *= dEC(0.5, d, ["Water", "Ice", "Light", "Earth", "Rock", "Crystal", "Glass", "Cyber"]);
-            mul *= dEC(0, d, ["Psychic"]);
-            break;
-        case "Earth": 
-            mul *= dEC(2, d, ["Fire", "Electric", "Poison", "Rock", "Metal", "Chemical", "Glass", "Virus"]);
-            mul *= dEC(0.5, d, ["Grass", "Insect", "Time", "Explosive", "Magnetic", "Wood"]);
-            mul *= dEC(0, d, ["Air", "Celestial"]);
-            break;
-        case "Fighting": 
-            mul *= dEC(2, d, ["Normal", "Ice", "Dark", "Rock", "Metal", "Sound", "Wood"]);
-            mul *= dEC(0.5, d, ["Air", "Poison", "Insect", "Psychic", "Mystic", "Time", "Glass", "Soul"]);
-            mul *= dEC(0, d, ["Spirit", "Crystal", "Shadow"]);
-            break;
-        case "Poison": 
-            mul *= dEC(2, d, ["Grass", "Air", "Mystic", "Volcanic", "Cyber", "Wood"]);
-            mul *= dEC(0.5, d, ["Earth", "Poison", "Spirit", "Psychic", "Virus", "Nuclear"]);
-            mul *= dEC(0, d, ["Metal", "Crystal", "Mech"]);
-            break;
-        case "Insect": 
-            mul *= dEC(2, d, ["Grass", "Dark", "Light", "Psychic", "Spectra", "Wood", "Shadow"]);
-            mul *= dEC(0.5, d, ["Fire", "Fighting", "Poison", "Metal", "Mystic", "Virus"]);
-            break;
-        case "Rock": 
-            mul *= dEC(2, d, ["Fire", "Ice", "Air", "Insect", "Chemical", "Glass"]);
-            mul *= dEC(0.5, d, ["Earth", "Fighting", "Metal", "Crystal", "Plasma", "Celestial", "Magnetic"]);
-            break;
-        case "Metal": 
-            mul *= dEC(2, d, ["Ice", "Sound", "Glass", "Magnetic", "Wood", "Nuclear"]);
-            mul *= dEC(0.5, d, ["Water", "Fire", "Electric", "Metal", "Crystal", "Mech", "Chemical", "Plasma", "Volcanic"]);
-            break;
-        case "Spirit": 
-            mul *= dEC(2, d, ["Spirit", "Psychic", "Cyber", "Cosmic"]);
-            mul *= dEC(0.5, d, ["Dark", "Light", "Soul"]);
-            mul *= dEC(0, d, ["Normal", "Magic", "Virus"]);
-            break;
-        case "Psychic": 
-            mul *= dEC(2, d, ["Fighting", "Poison", "Sound", "Plasma", "Virus", "Cyber", "Magnetic"]);
-            mul *= dEC(0.5, d, ["Metal", "Psychic", "Magic", "Glass", "Celestial", "Cosmic", "Soul", "Nuclear"]);
-            mul *= dEC(0, d, ["Dark"]);
-            break;
-        case "Dragon": 
-            mul *= dEC(2, d, ["Dragon", "Volcanic", "Celestial", "Wood", "Ancient"]);
-            mul *= dEC(0.5, d, ["Metal", "Glass", "Spectra", "Nuclear"]);
-            mul *= dEC(0, d, ["Mystic"]);
-            break;
-        case "Mystic": 
-            mul *= dEC(2, d, ["Air", "Dark", "Light", "Fighting", "Dragon", "Sound", "Magic", "Plasma", "Virus", "Celestial", "Cosmic"]);
-            mul *= dEC(0.5, d, ["Fire", "Grass", "Poison", "Metal", "Soul"]);
-            mul *= dEC(0, d, ["Nuclear"]);
-            break;
-        case "Sound": 
-            mul *= dEC(2, d, ["Normal", "Water", "Ice", "Fighting", "Insect", "Rock", "Glass", "Virus", "Shadow"]);
-            mul *= dEC(0.5, d, ["Electric", "Light", "Earth", "Metal", "Spirit", "Psychic", "Sound", "Mech", "Celestial"]);
-            break;
-        case "Crystal": 
-            mul *= dEC(2, d, ["Electric", "Ice", "Dark", "Fighting", "Poison", "Spirit", "Mystic", "Sound", "Chemical", "Magic", "Volcanic", "Virus", "Celestial"]);
-            mul *= dEC(0.5, d, ["Grass", "Air", "Light", "Psychic", "Crystal", "Cosmic", "Nuclear"]);
-            break;
-        case "Mech": 
-            mul *= dEC(2, d, ["Grass", "Fighting", "Insect", "Metal", "Glass", "Wood", "Nuclear"]);
-            mul *= dEC(0.5, d, ["Fire", "Air", "Earth", "Spirit", "Mech", "Chemical", "Explosive", "Plasma"]);
-            break;
-        case "Time": 
-            mul *= dEC(2, d, ["Normal", "Earth", "Fighting", "Mystic", "Time", "Ancient"]);
-            mul *= dEC(0.5, d, ["Psychic", "Celestial", "Cosmic", "Magnetic", "Spectra"]);
-            break;
-        case "Chemical": 
-            mul *= dEC(2, d, ["Water", "Grass", "Electric", "Ice", "Insect", "Metal", "Crystal", "Mech", "Chemical", "Cyber", "Magnetic", "Wood"]);
-            mul *= dEC(0.5, d, ["Fire", "Air", "Light", "Earth", "Rock", "Cosmic", "Shadow", "Nuclear"]);
-            mul *= dEC(0, d, ["Dark", "Spirit", "Celestial", "Soul"]);
-            break;
-        case "Explosive": 
-            mul *= dEC(2, d, ["Ice", "Earth", "Rock", "Metal", "Mech", "Glass"]);
-            mul *= dEC(0.5, d, ["Water", "Fire", "Air", "Sound", "Plasma", "Nuclear"]);
-            mul *= dEC(0, d, ["Soul"]);
-            break;
-        case "Magic": 
-            mul *= dEC(2, d, ["Electric", "Air", "Dark", "Fighting", "Crystal", "Magic", "Magnetic", "Spectra"]);
-            mul *= dEC(0.5, d, ["Light", "Metal", "Psychic", "Plasma", "Celestial", "Cosmic", "Shadow", "Nuclear"]);
-            break;
-        case "Plasma": 
-            mul *= dEC(2, d, ["Water", "Fire", "Electric", "Ice", "Spirit", "Explosive", "Virus", "Nuclear"]);
-            mul *= dEC(0.5, d, ["Psychic", "Sound", "Plasma", "Celestial", "Cosmic", "Magnetic", "Spectra"]);
-            mul *= dEC(0, d, ["Volcanic"]);
-            break;
-        case "Volcanic": 
-            mul *= dEC(2, d, ["Fire", "Ice", "Dark", "Poison", "Rock", "Metal", "Sound", "Chemical", "Explosive", "Virus", "Wood", "Nuclear"]);
-            mul *= dEC(0.5, d, ["Water", "Air", "Earth", "Dragon", "Volcanic", "Ancient"]);
-            mul *= dEC(0, d, ["Plasma"]);
-            break;
-        case "Glass": 
-            mul *= dEC(2, d, ["Light", "Psychic", "Mystic", "Plasma", "Glass", "Spectra"]);
-            mul *= dEC(0.5, d, ["Normal", "Dark", "Fighting", "Rock", "Spirit", "Sound", "Soul", "Shadow"]);
-            break;
-        case "Virus": 
-            mul *= dEC(2, d, ["Normal", "Water", "Fighting", "Insect", "Psychic", "Magic", "Celestial", "Wood"]);
-            mul *= dEC(0.5, d, ["Electric", "Earth", "Rock", "Spirit", "Dragon", "Cyber", "Soul"]);
-            break;
-        case "Cyber": 
-            mul *= dEC(2, d, ["Poison", "Spirit", "Psychic", "Plasma", "Cyber"]);
-            mul *= dEC(0.5, d, ["Water", "Electric", "Earth", "Fighting", "Insect", "Chemical", "Virus", "Cosmic", "Magnetic"]);
-            break;
-        case "Celestial": 
-            mul *= dEC(2, d, ["Normal", "Light", "Mystic", "Soul", "Ancient"]);
-            mul *= dEC(0.5, d, ["Dark", "Dragon", "Cyber", "Celestial", "Cosmic"]);
-            break;
-        case "Cosmic": 
-            mul *= dEC(2, d, ["Air", "Earth", "Spirit", "Psychic", "Crystal", "Glass", "Virus", "Celestial", "Cosmic", "Spectra", "Ancient"]);
-            mul *= dEC(0.5, d, ["Normal", "Fire", "Dark", "Rock", "Cyber", "Soul"]);
-            break;
-        case "Magnetic": 
-            mul *= dEC(2, d, ["Electric", "Metal", "Time", "Plasma", "Cyber", "Magnetic", "Soul"]);
-            mul *= dEC(0.5, d, ["Earth", "Fighting", "Spirit", "Psychic", "Ancient"]);
-            break;
-        case "Spectra": 
-            mul *= dEC(2, d, ["Fighting", "Chemical", "Soul", "Shadow"]);
-            mul *= dEC(0.5, d, ["Normal", "Dark", "Light", "Spirit", "Psychic", "Time", "Explosive", "Spectra", "Nuclear", "Ancient"]);
-            mul *= dEC(0, d, ["Water", "Ice", "Mystic", "Crystal", "Glass"]);
-            break;
-        case "Wood": 
-            mul *= dEC(2, d, ["Water", "Air", "Cyber", "Spectra"]);
-            mul *= dEC(0.5, d, ["Fire", "Ice", "Fighting", "Rock", "Metal", "Spirit", "Mech", "Chemical", "Plasma", "Volcanic", "Virus", "Wood", "Nuclear"]);
-            mul *= dEC(0, d, ["Crystal"]);
-            break;
-        case "Soul": 
-            mul *= dEC(2, d, ["Normal", "Air", "Poison", "Dragon", "Mech", "Virus", "Magnetic", "Soul"]);
-            mul *= dEC(0.5, d, ["Water", "Fire", "Electric", "Light", "Earth", "Spirit", "Mystic", "Crystal", "Chemical", "Plasma", "Cosmic", "Spectra", "Ancient"]);
-            mul *= dEC(0, d, ["Fighting"]);
-            break;
-        case "Shadow": 
-            mul *= dEC(2, d, ["Fighting", "Spirit", "Mystic", "Chemical", "Glass"]);
-            mul *= dEC(0.5, d, ["Fire", "Electric", "Air", "Dark", "Light", "Volcanic", "Celestial", "Spectra"]);
-            mul *= dEC(0, d, ["Shadow"]);
-            break;
-        case "Nuclear": 
-            mul *= dEC(2, d, ["Water", "Grass", "Fighting", "Rock", "Psychic", "Crystal", "Chemical", "Explosive", "Plasma", "Spectra", "Wood"]);
-            mul *= dEC(0.5, d, ["Electric", "Poison", "Mech"]);
-            break;
-        case "Ancient": 
-            mul *= dEC(2, d, ["Air", "Dragon", "Sound", "Chemical", "Explosive", "Soul", "Shadow", "Ancient"]);
-            mul *= dEC(0.5, d, ["Electric", "Light", "Metal", "Mech", "Cyber", "Magnetic"]);
-            break;
-        case "Physical": // dummy for secondary attack types
-            break;
-        case "Magical": // dummy for secondary attack types
-            break;
-        case "": // no element is considered here
-            break;
-        default:
-            console.log("unknown element: " + attacking[i]);
-            break;
+            case "Normal": 
+                mul *= dEC(0.5, d, ["Rock", "Metal", "Crystal", "Mech", "Chemical", "Volcanic", "Virus"]);
+                mul *= dEC(0, d, ["Spirit", "Soul"]);
+                break;
+            case "Water": 
+                mul *= dEC(2, d, ["Fire", "Earth", "Rock", "Volcanic", "Cyber", "Magnetic", "Spectra"]);
+                mul *= dEC(0.5, d, ["Water", "Grass", "Air", "Dragon", "Chemical", "Plasma", "Glass", "Celestial", "Wood", "Nuclear", "Ancient"]);
+                break;
+            case "Fire": 
+                mul *= dEC(2, d, ["Grass", "Ice", "Air", "Insect", "Metal", "Explosive", "Virus", "Wood", "Shadow", "Nuclear"]);
+                mul *= dEC(0.5, d, ["Water", "Fire", "Light", "Rock", "Dragon", "Mystic", "Volcanic", "Glass", "Ancient"]);
+                mul *= dEC(0, d, ["Crystal"]);
+                break;
+            case "Grass": 
+                mul *= dEC(2, d, ["Water", "Earth", "Rock", "Crystal"]);
+                mul *= dEC(0.5, d, ["Fire", "Grass", "Air", "Poison", "Insect", "Metal", "Dragon", "Mystic", "Plasma", "Glass", "Virus", "Cyber"]);
+                break;
+            case "Electric": 
+                mul *= dEC(2, d, ["Water", "Crystal", "Time", "Virus", "Cyber", "Magnetic"]);
+                mul *= dEC(0.5, d, ["Grass", "Electric", "Light", "Dragon", "Plasma", "Glass", "Wood", "Soul"]);
+                mul *= dEC(0, d, ["Earth"]);
+                break;
+            case "Ice": 
+                mul *= dEC(2, d, ["Grass", "Air", "Earth", "Dragon", "Time", "Volcanic", "Virus", "Soul", "Shadow", "Nuclear"]);
+                mul *= dEC(0.5, d, ["Water", "Fire", "Ice", "Metal", "Explosive", "Plasma", "Ancient"]);
+                break;
+            case "Air": 
+                mul *= dEC(2, d, ["Grass", "Earth", "Fighting", "Insect", "Explosive"]);
+                mul *= dEC(0.5, d, ["Water", "Air", "Rock", "Metal", "Psychic", "Mech", "Magic", "Volcanic", "Cosmic", "Wood", "Soul"]);
+                mul *= dEC(0, d, ["Chemical"]);
+                break;
+            case "Dark": 
+                mul *= dEC(2, d, ["Light", "Spirit", "Psychic", "Crystal", "Magic", "Glass", "Soul"]);
+                mul *= dEC(0.5, d, ["Dark", "Fighting", "Mystic", "Virus", "Spectra", "Shadow"]);
+                break;
+            case "Light": 
+                mul *= dEC(2, d, ["Dark", "Magic", "Soul", "Shadow", "Ancient"]);
+                mul *= dEC(0.5, d, ["Water", "Ice", "Light", "Earth", "Rock", "Crystal", "Glass", "Cyber"]);
+                mul *= dEC(0, d, ["Psychic"]);
+                break;
+            case "Earth": 
+                mul *= dEC(2, d, ["Fire", "Electric", "Poison", "Rock", "Metal", "Chemical", "Glass", "Virus"]);
+                mul *= dEC(0.5, d, ["Grass", "Insect", "Time", "Explosive", "Magnetic", "Wood"]);
+                mul *= dEC(0, d, ["Air", "Celestial"]);
+                break;
+            case "Fighting": 
+                mul *= dEC(2, d, ["Normal", "Ice", "Dark", "Rock", "Metal", "Sound", "Wood"]);
+                mul *= dEC(0.5, d, ["Air", "Poison", "Insect", "Psychic", "Mystic", "Time", "Glass", "Soul"]);
+                mul *= dEC(0, d, ["Spirit", "Crystal", "Shadow"]);
+                break;
+            case "Poison": 
+                mul *= dEC(2, d, ["Grass", "Air", "Mystic", "Volcanic", "Cyber", "Wood"]);
+                mul *= dEC(0.5, d, ["Earth", "Poison", "Spirit", "Psychic", "Virus", "Nuclear"]);
+                mul *= dEC(0, d, ["Metal", "Crystal", "Mech"]);
+                break;
+            case "Insect": 
+                mul *= dEC(2, d, ["Grass", "Dark", "Light", "Psychic", "Spectra", "Wood", "Shadow"]);
+                mul *= dEC(0.5, d, ["Fire", "Fighting", "Poison", "Metal", "Mystic", "Virus"]);
+                break;
+            case "Rock": 
+                mul *= dEC(2, d, ["Fire", "Ice", "Air", "Insect", "Chemical", "Glass"]);
+                mul *= dEC(0.5, d, ["Earth", "Fighting", "Metal", "Crystal", "Plasma", "Celestial", "Magnetic"]);
+                break;
+            case "Metal": 
+                mul *= dEC(2, d, ["Ice", "Sound", "Glass", "Magnetic", "Wood", "Nuclear"]);
+                mul *= dEC(0.5, d, ["Water", "Fire", "Electric", "Metal", "Crystal", "Mech", "Chemical", "Plasma", "Volcanic"]);
+                break;
+            case "Spirit": 
+                mul *= dEC(2, d, ["Spirit", "Psychic", "Cyber", "Cosmic"]);
+                mul *= dEC(0.5, d, ["Dark", "Light", "Soul"]);
+                mul *= dEC(0, d, ["Normal", "Magic", "Virus"]);
+                break;
+            case "Psychic": 
+                mul *= dEC(2, d, ["Fighting", "Poison", "Sound", "Plasma", "Virus", "Cyber", "Magnetic"]);
+                mul *= dEC(0.5, d, ["Metal", "Psychic", "Magic", "Glass", "Celestial", "Cosmic", "Soul", "Nuclear"]);
+                mul *= dEC(0, d, ["Dark"]);
+                break;
+            case "Dragon": 
+                mul *= dEC(2, d, ["Dragon", "Volcanic", "Celestial", "Wood", "Ancient"]);
+                mul *= dEC(0.5, d, ["Metal", "Glass", "Spectra", "Nuclear"]);
+                mul *= dEC(0, d, ["Mystic"]);
+                break;
+            case "Mystic": 
+                mul *= dEC(2, d, ["Air", "Dark", "Light", "Fighting", "Dragon", "Sound", "Magic", "Plasma", "Virus", "Celestial", "Cosmic"]);
+                mul *= dEC(0.5, d, ["Fire", "Grass", "Poison", "Metal", "Soul"]);
+                mul *= dEC(0, d, ["Nuclear"]);
+                break;
+            case "Sound": 
+                mul *= dEC(2, d, ["Normal", "Water", "Ice", "Fighting", "Insect", "Rock", "Glass", "Virus", "Shadow"]);
+                mul *= dEC(0.5, d, ["Electric", "Light", "Earth", "Metal", "Spirit", "Psychic", "Sound", "Mech", "Celestial"]);
+                break;
+            case "Crystal": 
+                mul *= dEC(2, d, ["Electric", "Ice", "Dark", "Fighting", "Poison", "Spirit", "Mystic", "Sound", "Chemical", "Magic", "Volcanic", "Virus", "Celestial"]);
+                mul *= dEC(0.5, d, ["Grass", "Air", "Light", "Psychic", "Crystal", "Cosmic", "Nuclear"]);
+                break;
+            case "Mech": 
+                mul *= dEC(2, d, ["Grass", "Fighting", "Insect", "Metal", "Glass", "Wood", "Nuclear"]);
+                mul *= dEC(0.5, d, ["Fire", "Air", "Earth", "Spirit", "Mech", "Chemical", "Explosive", "Plasma"]);
+                break;
+            case "Time": 
+                mul *= dEC(2, d, ["Normal", "Earth", "Fighting", "Mystic", "Time", "Ancient"]);
+                mul *= dEC(0.5, d, ["Psychic", "Celestial", "Cosmic", "Magnetic", "Spectra"]);
+                break;
+            case "Chemical": 
+                mul *= dEC(2, d, ["Water", "Grass", "Electric", "Ice", "Insect", "Metal", "Crystal", "Mech", "Chemical", "Cyber", "Magnetic", "Wood"]);
+                mul *= dEC(0.5, d, ["Fire", "Air", "Light", "Earth", "Rock", "Cosmic", "Shadow", "Nuclear"]);
+                mul *= dEC(0, d, ["Dark", "Spirit", "Celestial", "Soul"]);
+                break;
+            case "Explosive": 
+                mul *= dEC(2, d, ["Ice", "Earth", "Rock", "Metal", "Mech", "Glass"]);
+                mul *= dEC(0.5, d, ["Water", "Fire", "Air", "Sound", "Plasma", "Nuclear"]);
+                mul *= dEC(0, d, ["Soul"]);
+                break;
+            case "Magic": 
+                mul *= dEC(2, d, ["Electric", "Air", "Dark", "Fighting", "Crystal", "Magic", "Magnetic", "Spectra"]);
+                mul *= dEC(0.5, d, ["Light", "Metal", "Psychic", "Plasma", "Celestial", "Cosmic", "Shadow", "Nuclear"]);
+                break;
+            case "Plasma": 
+                mul *= dEC(2, d, ["Water", "Fire", "Electric", "Ice", "Spirit", "Explosive", "Virus", "Nuclear"]);
+                mul *= dEC(0.5, d, ["Psychic", "Sound", "Plasma", "Celestial", "Cosmic", "Magnetic", "Spectra"]);
+                mul *= dEC(0, d, ["Volcanic"]);
+                break;
+            case "Volcanic": 
+                mul *= dEC(2, d, ["Fire", "Ice", "Dark", "Poison", "Rock", "Metal", "Sound", "Chemical", "Explosive", "Virus", "Wood", "Nuclear"]);
+                mul *= dEC(0.5, d, ["Water", "Air", "Earth", "Dragon", "Volcanic", "Ancient"]);
+                mul *= dEC(0, d, ["Plasma"]);
+                break;
+            case "Glass": 
+                mul *= dEC(2, d, ["Light", "Psychic", "Mystic", "Plasma", "Glass", "Spectra"]);
+                mul *= dEC(0.5, d, ["Normal", "Dark", "Fighting", "Rock", "Spirit", "Sound", "Soul", "Shadow"]);
+                break;
+            case "Virus": 
+                mul *= dEC(2, d, ["Normal", "Water", "Fighting", "Insect", "Psychic", "Magic", "Celestial", "Wood"]);
+                mul *= dEC(0.5, d, ["Electric", "Earth", "Rock", "Spirit", "Dragon", "Cyber", "Soul"]);
+                break;
+            case "Cyber": 
+                mul *= dEC(2, d, ["Poison", "Spirit", "Psychic", "Plasma", "Cyber"]);
+                mul *= dEC(0.5, d, ["Water", "Electric", "Earth", "Fighting", "Insect", "Chemical", "Virus", "Cosmic", "Magnetic"]);
+                break;
+            case "Celestial": 
+                mul *= dEC(2, d, ["Normal", "Light", "Mystic", "Soul", "Ancient"]);
+                mul *= dEC(0.5, d, ["Dark", "Dragon", "Cyber", "Celestial", "Cosmic"]);
+                break;
+            case "Cosmic": 
+                mul *= dEC(2, d, ["Air", "Earth", "Spirit", "Psychic", "Crystal", "Glass", "Virus", "Celestial", "Cosmic", "Spectra", "Ancient"]);
+                mul *= dEC(0.5, d, ["Normal", "Fire", "Dark", "Rock", "Cyber", "Soul"]);
+                break;
+            case "Magnetic": 
+                mul *= dEC(2, d, ["Electric", "Metal", "Time", "Plasma", "Cyber", "Magnetic", "Soul"]);
+                mul *= dEC(0.5, d, ["Earth", "Fighting", "Spirit", "Psychic", "Ancient"]);
+                break;
+            case "Spectra": 
+                mul *= dEC(2, d, ["Fighting", "Chemical", "Soul", "Shadow"]);
+                mul *= dEC(0.5, d, ["Normal", "Dark", "Light", "Spirit", "Psychic", "Time", "Explosive", "Spectra", "Nuclear", "Ancient"]);
+                mul *= dEC(0, d, ["Water", "Ice", "Mystic", "Crystal", "Glass"]);
+                break;
+            case "Wood": 
+                mul *= dEC(2, d, ["Water", "Air", "Cyber", "Spectra"]);
+                mul *= dEC(0.5, d, ["Fire", "Ice", "Fighting", "Rock", "Metal", "Spirit", "Mech", "Chemical", "Plasma", "Volcanic", "Virus", "Wood", "Nuclear"]);
+                mul *= dEC(0, d, ["Crystal"]);
+                break;
+            case "Soul": 
+                mul *= dEC(2, d, ["Normal", "Air", "Poison", "Dragon", "Mech", "Virus", "Magnetic", "Soul"]);
+                mul *= dEC(0.5, d, ["Water", "Fire", "Electric", "Light", "Earth", "Spirit", "Mystic", "Crystal", "Chemical", "Plasma", "Cosmic", "Spectra", "Ancient"]);
+                mul *= dEC(0, d, ["Fighting"]);
+                break;
+            case "Shadow": 
+                mul *= dEC(2, d, ["Fighting", "Spirit", "Mystic", "Chemical", "Glass"]);
+                mul *= dEC(0.5, d, ["Fire", "Electric", "Air", "Dark", "Light", "Volcanic", "Celestial", "Spectra"]);
+                mul *= dEC(0, d, ["Shadow"]);
+                break;
+            case "Nuclear": 
+                mul *= dEC(2, d, ["Water", "Grass", "Fighting", "Rock", "Psychic", "Crystal", "Chemical", "Explosive", "Plasma", "Spectra", "Wood"]);
+                mul *= dEC(0.5, d, ["Electric", "Poison", "Mech"]);
+                break;
+            case "Ancient": 
+                mul *= dEC(2, d, ["Air", "Dragon", "Sound", "Chemical", "Explosive", "Soul", "Shadow", "Ancient"]);
+                mul *= dEC(0.5, d, ["Electric", "Light", "Metal", "Mech", "Cyber", "Magnetic"]);
+                break;
+            case "Physical": // dummy for secondary attack types
+                break;
+            case "Magical": // dummy for secondary attack types
+                break;
+            case "": // no element is considered here
+                break;
+            default:
+                console.log("unknown element: " + attacking[i]);
+                break;
         }
     }
     if (!(mul === 1)){
@@ -252,7 +252,7 @@ function allInQueue(){
             throw new Error("Hey! Something went wrong! I can't process this!");
         }
         if (damageList[i] === "Damage"){
-            people[damageList[i+2]].extraInfo[0] = damageList[i+1];
+            people[damageList[i+2]].extraVar.hit = damageList[i+1];
             let damage = Math.random()*100
             let crit = false
             for (let j = damageList[i+4].length - 1; j >= 0; --j){ // critical hit checker
@@ -283,7 +283,11 @@ function allInQueue(){
             people[damageList[i+2]].hitTimer = 0;
             if (people[damageList[i+2]].health <= 0) console.log("Mortal! [" + format(-1 * people[damageList[i+2]].health, 3, 1000000) + "] HP overkill");
             console.log(format(trueDamage, 3, 1000000) + " damage");
-            peopleObj[damageList[i+2]].hitScript()
+            try {
+                peopleObj[damageList[i+2]].hitScript(trueDamage);
+            } catch {
+                throw new Error(`${damageList[i+2]} does not have a hit script! Please add a hit script to ${damageList[i+2]} in objects.js!`);
+            }
             i = i + 9;
         }    
         //damageList.push("Heal", this.name, person, healing, variance, type);
@@ -369,6 +373,11 @@ function allInQueue(){
                 people[pA].sDuration.push(duration);
                 people[pA].sStrength.push(strength);
             }
+            try {
+                peopleObj[damageList[i+2]].effectScript();
+            } catch {
+                console.warn(`${damageList[i+2]} does not have an effect script.`);
+            }
             i = i + 7;
         }    
     }
@@ -437,7 +446,7 @@ function updateVisuals(){
     let dlastHP;
     let dcurrHP;
     for (let i = 0; i < peopleNames.length; ++i){
-        dcurrHP = clamp(people[peopleNames[i]].health / people[peopleNames[i]].maxHealth,0,1);
+        dcurrHP = clamp(lastHP2[i] / people[peopleNames[i]].maxHealth,0,1);
         dlastHP = clamp(lastHP[i] / people[peopleNames[i]].maxHealth,0,1);
         let [left, top, width, height] = translateXY(people[peopleNames[i]].xPosition,
             people[peopleNames[i]].yPosition, 
@@ -463,25 +472,58 @@ function updateVisuals(){
         // gameLoop @ main.js:583
         // requestAnimationFrame (async)
         // (anonymous) @ main.js:543
-        let stupidFix = [left, top, width, height] = translateXY(people[peopleNames[i]].xPosition + people[peopleNames[i]].xPosHP * people[peopleNames[i]].size - (people[peopleNames[i]].sizeX * 0.5),
+        let stupidFix = [left, top, width, height] = translateXY(
+            people[peopleNames[i]].xPosition + people[peopleNames[i]].xPosHP * people[peopleNames[i]].size - (people[peopleNames[i]].sizeX * 0.5),
             people[peopleNames[i]].yPosition + people[peopleNames[i]].yPosHP * people[peopleNames[i]].size, 
             people[peopleNames[i]].sizeX * people[peopleNames[i]].sHP * people[peopleNames[i]].size, 
             8 * people[peopleNames[i]].sHP * people[peopleNames[i]].size
             );
+            
         changeAtt(hpBarZ[i], stupidFix[0], stupidFix[1], stupidFix[2], stupidFix[3]);
-        changeAtt(hpBarC[i], "", "", stupidFix[2], stupidFix[3], gRC(2 * dcurrHP, 0.25, 1));
-        changeAtt(hpBarB[i], "", "", dlastHP * stupidFix[2], stupidFix[3], gRC(1, 0.9, (Math.sin(24 * Time) / 2) + 0.5));
-        changeAtt(hpBarA[i], "", "", dcurrHP * stupidFix[2], stupidFix[3], gRC(2 * dcurrHP, 1, 1));
+        
+        let color 
+        let color2
+        
+        if (people[peopleNames[i]].extraInfo[0].hpBars > 1){
+            let nests = people[peopleNames[i]].extraInfo[0].hpBars
+            let hpI = (dcurrHP * nests) + 1;
+        
+            if (people[peopleNames[i]].extraInfo[0].hpBarColor[0] === "default") {
+                color = people[peopleNames[i]].extraInfo[0].hpBarColor[Math.min(Math.floor(hpI), (people[peopleNames[i]].extraInfo[0].hpBarColor.length - 1))];
+                if (Math.floor(hpI) < 2){
+                    color2 = colorChange(color, 0.25, 1.0);
+                } else {
+                    color2 = people[peopleNames[i]].extraInfo[0].hpBarColor[Math.min(Math.floor(hpI), (people[peopleNames[i]].extraInfo[0].hpBarColor.length - 1)) - 1];
+                }
+            }
+
+            hpBarD[i].style.zIndex = (Math.floor(dcurrHP * nests) >= Math.floor(dlastHP * nests)) ? 2 : 4
+            changeAtt(hpBarC[i], "", "",                                stupidFix[2], stupidFix[3], color2);
+            changeAtt(hpBarB[i], "", "",      Math.min(1, ((dlastHP * nests) - Math.floor(dcurrHP * nests))) * stupidFix[2], stupidFix[3], gRC(1, 0.9, (Math.sin(24 * Time) / 2) + 0.5));
+            changeAtt(hpBarA[i], "", "",      ((dcurrHP * nests) % 1) * stupidFix[2], stupidFix[3], color);
+            changeAtt(hpBarD[i], "", "",      ((dlastHP * nests) - Math.floor(dlastHP * nests)) * stupidFix[2], stupidFix[3], gRC(1, 0.9, (Math.sin(24 * Time) / 2) + 0.5));
+        } else {
+            
+            changeAtt(hpBarC[i], "", "",           stupidFix[2], stupidFix[3], gRC(2 * dcurrHP, 0.25, 1));
+            changeAtt(hpBarB[i], "", "", dlastHP * stupidFix[2], stupidFix[3], gRC(1, 0.9, (Math.sin(24 * Time) / 2) + 0.5));
+            changeAtt(hpBarA[i], "", "", dcurrHP * stupidFix[2], stupidFix[3], gRC(2 * dcurrHP, 1, 1));
+        }
+        
         hpBarZ[i].style.border = stupidFix[3] / 2 + "px solid #181818";
-        dcurrHP = clamp(people[peopleNames[i]].mana / people[peopleNames[i]].maxMana,0,1);
-        stupidFix = translateXY(people[peopleNames[i]].xPosition + people[peopleNames[i]].xPosHP * people[peopleNames[i]].size - (people[peopleNames[i]].sizeX * 0.5),
+        
+        dcurrHP = clamp(people[peopleNames[i]].mana / people[peopleNames[i]].maxMana, 0, 1);
+        
+        stupidFix = translateXY(
+            people[peopleNames[i]].xPosition + people[peopleNames[i]].xPosHP * people[peopleNames[i]].size - (people[peopleNames[i]].sizeX * 0.5),
             people[peopleNames[i]].yPosition + ((people[peopleNames[i]].yPosHP + 8 * people[peopleNames[i]].sHP * people[peopleNames[i]].size) * people[peopleNames[i]].size), 
             people[peopleNames[i]].sizeX * people[peopleNames[i]].sHP * people[peopleNames[i]].size, 
             4 * people[peopleNames[i]].sHP * people[peopleNames[i]].size
             );
+            
         changeAtt(mpBarZ[i], stupidFix[0], stupidFix[1], stupidFix[2], stupidFix[3]);
         changeAtt(mpBarB[i], "", "", stupidFix[2], stupidFix[3], gRC(4 - (dcurrHP / 2), 0.25, 1));
         changeAtt(mpBarA[i], "", "", dcurrHP * stupidFix[2], stupidFix[3], gRC(4 - (dcurrHP / 2), 1, 1));
+            
         mpBarZ[i].style.border = stupidFix[3] + "px solid #181818";
     }
 }
@@ -496,21 +538,39 @@ function changeAtt(spriteID, left, top, width, height, bgColor, src){
     if (!(src === "" || src === undefined)) sprite.src = src;
 }
 
-function updateLastHP(){
+function updateLastHP(delta){
     let hp
     let mhp
     for (let i = 0; i < peopleNames.length; ++i){
         hp = people[peopleNames[i]].health
         mhp = people[peopleNames[i]].maxHealth
         people[peopleNames[i]].hitTimer = people[peopleNames[i]].hitTimer + delta;
+        lastHP2[i] = lerp(1 - (0.0004 ** delta), lastHP2[i], hp)
         if (people[peopleNames[i]].hitTimer >= 1){
-            if ((lastHP[i] - hp) > (mhp * delta * 0.25)){
-                lastHP[i] += mhp * delta * 0.25 * ((lastHP[i] > hp) ? -1 : 1);
+            if ((lastHP[i] - hp) > (mhp * delta * 0.25 / people[peopleNames[i]].extraInfo[0].hpBars)){
+                lastHP[i] += (mhp * delta * 0.25 * ((lastHP[i] > hp) ? -1 : 1)) / people[peopleNames[i]].extraInfo[0].hpBars;
             } else {
                 lastHP[i] = hp;
             }
         }
     }
+}
+
+function colorChange(color, val, sat){ // #ABCDEF format only
+    if (color[0] === "#") {color = color.slice(1);}
+    color = parseInt(color, 16)
+    let r = ((color >> 16) % 256) / 256
+    let g = ((color >> 8) % 256) / 256
+    let b = (color % 256) / 256
+    r = 1 - ((1 - r) * sat);
+    g = 1 - ((1 - g) * sat);
+    b = 1 - ((1 - b) * sat);
+    r = Math.min(255, r * val * 256);
+    g = Math.min(255, g * val * 256);
+    b = Math.min(255, b * val * 256);
+    return "#" + pad(Math.floor(r).toString(16), 2) 
+               + pad(Math.floor(g).toString(16), 2) 
+               + pad(Math.floor(b).toString(16), 2);
 }
 
 function gRC(time, val, sat){
@@ -579,7 +639,16 @@ window.addEventListener('load', function() {
 
     for (let i = 0; i < peopleNames.length; i++){
         console.log(i + "   -   " + peopleNames[i])
-        peopleObj[peopleNames[i]].init()
+        try {
+            peopleObj[peopleNames[i]].init()
+        } catch {
+            console.log(`${peopleNames[i]} doesn't have anything (general) to initalize!`)
+        }
+        try {
+            peopleObj[peopleNames[i]].defaultAct.initEI0()
+        } catch {
+            console.log(`${peopleNames[i]} doesn't have anything (setting) to initalize!`)
+        }
         peopleObj[peopleNames[i]].defaultAct.introduction()
     }
 
@@ -593,9 +662,9 @@ window.addEventListener('load', function() {
         music[musicState].volume = musicVolume;
         if (Time > shakeRandomInterval){
             shakeRandomListX.push((Math.random() - 0.5) * 2);
-            shakeRandomListX.splice(0,1);
+            shakeRandomListX.splice(0, 1);
             shakeRandomListY.push((Math.random() - 0.5) * 2);
-            shakeRandomListY.splice(0,1);
+            shakeRandomListY.splice(0, 1);
             shakeRandomInterval =  Time + 0.02;
         }
         if (Time > lastTurn){
@@ -603,26 +672,23 @@ window.addEventListener('load', function() {
             if (alive[2].length === 0){currentState.ended = Infinity;} // a tie, but everyone is knocked out smh
             if (alive[2].length === 1){currentState.ended = alive[2][0];} // winning team
             if (currentState.ended === 0){
-                getTurnOrder(alive[0], alive[1]);
-                console.log(turnOrder[turnID].name + "'s turn!");
-                try {
-                    peopleObj[peopleNames[turnID]].doTurn()
-                } catch (e) {
-                    console.info("Next person (" + turnOrder[turnID].name + ") died before they could get their turn!")
-                    turnID = 0;
-                    turnSeq++;
-                    peopleObj[peopleNames[turnID]].doTurn()
+                if (people[peopleNames[turnID]].alive === true) {
+                    console.log(`${peopleNames[turnID]}'s turn!`)
+                    peopleObj[peopleNames[turnID]].doTurn();
+                } else {
+                    console.log(`${peopleNames[turnID]} died before they could get their turn!`)
                 }
                 turnID++;
                 if (turnID >= alive[1]){
                     turnID = 0;
+                    getTurnOrder(alive[0], alive[1]);
                     turnSeq++;
                 }
                 lastTurn = Time + timeForTurn;
             }
         }
         updateVisuals();
-        updateLastHP();
+        updateLastHP(delta);
         // do not change
         oldTimeStamp = timeStamp;
         window.requestAnimationFrame(gameLoop);
@@ -635,7 +701,7 @@ function comboSFX(amt, pow){
 }
 
 function start(){
-    newMusic(musicState);
+    //newMusic(musicState);
     done = true;
 }
 
