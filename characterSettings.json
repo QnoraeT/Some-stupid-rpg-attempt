@@ -3,7 +3,49 @@
         "hpBars": 3,
         "blood": true,
         "hpBarColor": ["default", "#00ffff", "#00acff", "#0000ff"],
-        "description": "Alterian Skyler is a cyan colored humanoid person, which is also cat-like. Their full name is \"Alterian Yeafron Skyler\", although they are more generally known as \"Kyron Yeafron Skyler\" due to phase changes that relate with names. They are a member of the SB (Squary Boi) species. Their birthday is October 21, 2018. They have many phases, that all include different elements and slightly different behaviors."
+        "description": "Alterian Skyler is a cyan colored humanoid person, which is also cat-like. Their full name is \"Alterian Yeafron Skyler\", although they are more generally known as \"Kyron Yeafron Skyler\" due to phase changes that relate with names. They are a member of the SB (Squary Boi) species. Their birthday is October 21, 2018. They have many phases, that all include different elements and slightly different behaviors.",
+        "effectModifiers": {
+            "sleep": {
+                "limit": 1.0,
+                "regenAmtDiv": 35.0
+            }
+        }
+    },
+    "Alterian Skyler - Turret Electric": {
+        "hpBars": 1,
+        "blood": false,
+        "hpBarColor": "default",
+        "description": "Alterian Skyler - Turret Electric is a turret from Alterian Skyler used to shoot their enemies with different bullets. There are many more types of them."
+    },
+    "slime (Fire)": {
+        "hpBars": 3,
+        "blood": false,
+        "hpBarColor": ["default", "#c00000", "#e00000", "#ff0000"],
+        "description": "a slime, of course lmfao"
+    },
+    "slime (Grass)": {
+        "hpBars": 3,
+        "blood": false,
+        "hpBarColor": ["default", "#00c000", "#00e000", "#00ff00"],
+        "description": "a slime, of course lmfao"
+    },
+    "slime (Water)": {
+        "hpBars": 3,
+        "blood": false,
+        "hpBarColor": ["default", "#0000c0", "#0000e0", "#0000ff"],
+        "description": "a slime, of course lmfao"
+    },
+    "slime (Electric)": {
+        "hpBars": 3,
+        "blood": false,
+        "hpBarColor": ["default", "#c0c000", "#e0e000", "#ffff00"],
+        "description": "a slime, of course lmfao"
+    },
+    "BIG SLIME": {
+        "hpBars": 8,
+        "blood": false,
+        "hpBarColor": ["default", "#ffffff", "#ff0000", "#ff8000", "#ffff00", "#80ff00", "#00ff00", "#00ff80", "#00ffff"],
+        "description": "a slime, of course lmfao"
     },
     "ToWM TowerSB": {
         "hpBars": 1,
@@ -14,23 +56,36 @@
     "ToFUN TowerSB": {
         "hpBars": 1,
         "blood": false,
-        "naturalCounter": {
+        "naturalBlock": {
             "physical": true,
             "magical": false,
+            "counter": {
+                "damage": {
+                    "fromDamageReceived": 0.10,
+                    "fromATK": 0.15,
+                    "effects": [[23, 0.90, 0.4], [1, 0.20, 1.5]]
+                },
+                "chance": 1.0
+            },
             "damage": {
-                "fromDamageReceived": 0.10,
-                "fromATK": 0.15,
-                "effects": [[23, 0.90, 0.4], [1, 0.20, 1.5]]
+                "fromATK": 0.4
             }
         },
         "hpBarColor": "default",
         "description": "ToFUN:TowerSB is a blue-cyan white gradient humanoid person that came from a tower that TearonQ made, relating to JToH. She is another semi-canonical member of the SB (Squary Boi) species. Her attacks involve sharp weapons, and even touching her would cut you badly."
     },
     "FSBlue": {
-        "hpBars": 1,
+        "hpBars": 3,
         "blood": false,
         "hpBarColor": "default",
-        "description": "FSBlue is a blue furry fox-like character that wants many friends. She is a member of the SB (Squary Boi) species. She was made by a different person, but then defected over to TearonQ in 2019. She is also a transfem, transitioning in 2021."
+        "description": "FSBlue is a blue furry fox-like character that wants many friends. She is a member of the SB (Squary Boi) species. She was made by a different person, but then defected over to TearonQ in 2019. She is also a transfem, transitioning in 2021.",
+        "naturalBlock": {
+            "physical": true,
+            "magical": false,
+            "damage": {
+                "fromATK": 0.4
+            }
+        }
     },
     "Delet Ball": {
         "hpBars": 8,
