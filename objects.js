@@ -1,22 +1,30 @@
 "use strict";
 
-function getStat(person, modifiers) {
+function aniSegment(pHit, hit){
+    return pHit === hit ? -1 : hit
+}
+
+function getStat(person, modifiers = [1, 1, 1, 1, 1, 1]) {
     people[person].updateSTATEffects()
     return {
-        atk: people[person].trueAtk * modifiers[0],
-        def: people[person].trueDef * modifiers[1],
-        spd: people[person].trueSpd * modifiers[2],
-        dDef: people[person].trueDDef * modifiers[3],
+        PATK: people[person].truePATK * modifiers[0],
+        PDEF: people[person].truePDEF * modifiers[1],
+        MATK: people[person].trueMATK * modifiers[2],
+        MDEF: people[person].trueMDEF * modifiers[3],
+        spd: people[person].trueSpd * modifiers[4],
+        dDef: people[person].trueDDef * modifiers[5],
     }
 }
 
-function doMove(who, action, targets, effectT = [1]) {
+function doMove(who, action, targets, effectT = [1], endTime = 1) {
     people[who].action.push({
         action: action, 
         targets: targets, 
         time: Time,
         eTime: effectT,
-        hit: 0
+        pHit: 0,
+        hit: 0,
+        end: endTime
     });
 }
 
@@ -28,6 +36,7 @@ function objectBasics(person) {
                 console.log("hi!! i am " + person.name + "!");
             },
             target(ieType) {
+                // * i have to do this terribleness because js is weird and actually removes items from the original list which sucks
                 let candidates = Object.assign({}, people);
                 let candidatesNames = Array.from(peopleNames);
                 if (ieType[1] !== "includeDead") {
@@ -56,8 +65,8 @@ function objectBasics(person) {
                         return res.json();
                     })
                     .then((data) => people[person.name].extraInfo[0] = data[`${people[person.name].jsonType}`]);
-    
-                // * EXTRAINFO[0] CAN BE CHANGED!! REMEMBER THIS SO YOU DON'T PULL YOUR HAIR OUT ON HOW YOU CAN CHANGE STUFF IN THE JSON AFTER LOADING!
+
+                // ! EXTRAINFO[0] CAN BE CHANGED!! REMEMBER THIS SO YOU DON'T PULL YOUR HAIR OUT ON HOW YOU CAN CHANGE STUFF IN THE JSON AFTER LOADING!
                 } catch {
                     console.log(`${person.name} doesn't have an entry in the json...`)
                 }
@@ -95,16 +104,16 @@ let peopleObj = {
         effectScript() {
 
         },
-        hitScript(damage) {
-            people[this.objName].extraInfo[1] -= 48 * (damage / people[this.objName].maxHealth)
-            if (damage >= people[this.objName].maxHealth / 1000 && people[this.objName].health / people[this.objName].maxHealth < 1) {
+        hitScript(param) {
+            people[this.objName].extraInfo[1] -= 48 * (param.damage / people[this.objName].maxHealth)
+            if (param.damage >= people[this.objName].maxHealth / 1000 && people[this.objName].health / people[this.objName].maxHealth < 1) {
                 people[this.objName].extraInfo[1] -= 1 * Math.sqrt(1 - (people[this.objName].health / people[this.objName].maxHealth))
             }
             people[this.objName].extraInfo[2] = 100
             if (people[this.objName].sEffects.includes(4)) { // wake up from sleep after getting hit
                 for (let i = 0; i < people[this.objName].sEffects.length; ++i) {
                     if (people[this.objName].sEffects[i] === 4) {
-                        people[this.objName].sDuration[i] -= ((damage / people[this.objName].maxHealth) * 12) + ((damage / people[this.objName].maxHealth) >= 0.01) ? 0.1 : 0
+                        people[this.objName].sDuration[i] -= ((param.damage / people[this.objName].maxHealth) * 12) + ((param.damage / people[this.objName].maxHealth) >= 0.01) ? 0.1 : 0
                         if (people[this.objName].sDuration[i] <= 0) {
                             console.log(`${this.objName} woke up from getting hurt!`)
                             this.sEffects.splice(i, 1);
@@ -166,12 +175,8 @@ let peopleObj = {
             }
             console.log(`MOOD: ${people[this.objName].extraInfo[2]}`)
         },
-        getAtk() {
-            let atk = 1.0
-            return getStat(this.objName, [atk, 1, 1, 1]).atk;
-        },
         doTurn() {
-            this.hitScript(0)
+            this.hitScript({damage: 0})
             let mod = 0.2
             if (people[this.objName].extraInfo[1] <= 60) {
                 people[this.objName].damage(this.objName, mod * (60 - people[this.objName].extraInfo[1]) / 150 * people[this.objName].maxHealth, [0], [1], 0, ["Normal", "Physical"], 3);
@@ -257,13 +262,9 @@ let peopleObj = {
         doTurn() {
 
         },
-        getAtk() {
-            let atk = 1.0
-            return getStat(this.objName, [atk, 1, 1, 1]).atk;
-        },
-        hitScript(damage){
-            people[this.objName].extraInfo[1] -= 48 * (damage / people[this.objName].maxHealth)
-            if (damage >= people[this.objName].maxHealth / 1000 && people[this.objName].health / people[this.objName].maxHealth < 1) {
+        hitScript(param){
+            people[this.objName].extraInfo[1] -= 48 * (param.damage / people[this.objName].maxHealth)
+            if (param.damage >= people[this.objName].maxHealth / 1000 && people[this.objName].health / people[this.objName].maxHealth < 1) {
                 people[this.objName].extraInfo[1] -= 1 * Math.sqrt(1 - (people[this.objName].health / people[this.objName].maxHealth))
             }
         },
@@ -283,10 +284,6 @@ let peopleObj = {
                 }
             }
             console.log("I have finished initalizing!")
-        },
-        getAtk() {
-            let atk = 1.0
-            return getStat(this.objName, [atk, 1, 1, 1]).atk;
         },
         doTurn() {
 
@@ -308,12 +305,8 @@ let peopleObj = {
             }
             console.log("I have finished initalizing!")
         },
-        getAtk() {
-            let atk = 1.0
-            return getStat(this.objName, [atk, 1, 1, 1]).atk;
-        },
         doTurn() {
-            this.hitScript(0)
+            this.hitScript({damage: 0})
             allInQueue();
 
             if (people[this.objName].sEffects.includes(3) && (Math.random() > 0.75)) { console.log(`[${this.objName}] - paralyzed!`); return; }
@@ -368,7 +361,7 @@ let peopleObj = {
                     */
                     case 0:
                         // * punch
-                        doMove(this.objName, "punch", this.defaultAct.target(["normal", "normal"]), [0.7]);
+                        doMove(this.objName, "punch", this.defaultAct.target(["normal", "normal"]), [0.7], 1.4);
                         // people[this.objName].damage(target, 1.2 * this.getAtk(), [4, 1], [3, 6], 10, ["Normal", "Fighting", "Magical"], 0)
                         // allInQueue()
                         success = true
@@ -388,7 +381,7 @@ let peopleObj = {
                     break;
             }
         },
-        hitScript(damage) {
+        hitScript(param) {
             people[this.objName].extraInfo[2] = 100
             let x = people[this.objName].health / people[this.objName].maxHealth
             people[this.objName].extraInfo[2] -= 50 * -1 * ((1 - x) ** 2) // 50% HP = -12.5
@@ -407,11 +400,7 @@ let peopleObj = {
         doTurn() {
 
         },
-        getAtk() {
-            let atk = 1.0
-            return getStat(this.objName, [atk, 1, 1, 1]).atk;
-        },
-        hitScript(damage) {
+        hitScript(param) {
 
         }
     },
@@ -421,27 +410,38 @@ let peopleObj = {
         doTurn() {
 
         },
-        getAtk() {
-            let atk = 1.0
-            return getStat(this.objName, [atk, 1, 1, 1]).atk;
-        },
-        hitScript(damage) {
+        hitScript(param) {
 
         }
     },
 }
 
+loadedPeopleObj = true;
+
 function animate(){
     for (let i = 0; i < peopleNames.length; i++) {
         let action, pos, time, effectTime
+        pos = [people[peopleNames[i]].baseXPos, people[peopleNames[i]].baseYPos];
         if (people[peopleNames[i]].action.length === 0) {
             action = {action: "idle"};
         } else {
             action = people[peopleNames[i]].action[0];
-            pos = [people[peopleNames[i]].baseXPos, people[peopleNames[i]].baseYPos];
-            time = action.time - Time;
+            time = Time - action.time;
             effectTime = action.eTime;
+            action.pHit = action.hit
+            if (action.targets === undefined) {
+                console.log(`${peopleNames[i]} tried ${action.action} on an entity that doesn't exist...`)
+                people[peopleNames[i]].action.splice(0, 1)
+                return;
+            }
+            for (let i = 0; i < action.eTime.length; i++) {
+                if (time >= action.eTime[i]) {
+                    action.eTime[i] = Infinity;
+                    action.hit++
+                }
+            }
         }
+
         switch (peopleNames[i]) {
             case "ToWM TowerSB":
                 break;
@@ -454,26 +454,35 @@ function animate(){
             case "FSBlue": 
                 switch (action.action) {
                     case "punch": 
-                        // simple ahh fuking animation lma
+                        // simple ahh animation lma
                         if (time < 0.7) {
                             people[peopleNames[i]].xPosition = lerp(time / 0.7, pos[0], people[action.targets].xPosition)
                             people[peopleNames[i]].yPosition = lerp(time / 0.7, pos[1], people[action.targets].yPosition)
                         } else {
-                            people[peopleNames[i]].xPosition = lerp(time / 0.7, people[action.targets].xPosition, pos[0])
-                            people[peopleNames[i]].yPosition = lerp(time / 0.7, people[action.targets].yPosition, pos[1])
+                            if (aniSegment(action.pHit, action.hit) === 1) {
+                                people[peopleNames[i]].damage(action.targets, getStat(peopleNames[i], [1.2]).PATK, [4, 1], [3, 6], 10, ["Fighting", "Physical"], 0)
+                                allInQueue()
+                            }
+                            people[peopleNames[i]].xPosition = lerp((time - 0.7) / 0.7, people[action.targets].xPosition, pos[0])
+                            people[peopleNames[i]].yPosition = lerp((time - 0.7) / 0.7, people[action.targets].yPosition, pos[1])
                         }
                         break;
                     default: 
                         people[peopleNames[i]].spriteState = "Idle" + Math.floor(((Time * 1.6) % 2) + 1)
+                        people[peopleNames[i]].xPosition = pos[0]
+                        people[peopleNames[i]].yPosition = pos[1]
                         break;
                 }
-                // people[this.objName].damage(target, 1.2 * this.getAtk(), [4, 1], [3, 6], 10, ["Normal", "Fighting", "Magical"], 0)
-                // allInQueue()
                 break;
             case "slime": 
                 break;
             default:
                 throw new Error(`did you forget to add ${peopleNames} in objects.js animate() ?`)
-            }
+        }
+
+        if (action.end < time) {
+            people[peopleNames[i]].action.splice(0, 1)
+            return;
+        }
     }
 }

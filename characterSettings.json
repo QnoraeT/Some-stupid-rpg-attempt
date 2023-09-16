@@ -77,7 +77,7 @@
     "FSBlue": {
         "hpBars": 3,
         "blood": false,
-        "hpBarColor": "default",
+        "hpBarColor": ["default", "#0000c0", "#0000ff", "#0060ff"],
         "description": "FSBlue is a blue furry fox-like character that wants many friends. She is a member of the SB (Squary Boi) species. She was made by a different person, but then defected over to TearonQ in 2019. She is also a transfem, transitioning in 2021.",
         "naturalBlock": {
             "physical": true,

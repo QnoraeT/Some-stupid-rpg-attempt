@@ -279,25 +279,32 @@ function allInQueue() {
             }
 
             damage *= checkElementEffective(damageList[i + 7], people[victim].type);
-            damage *= rand(1 / ((damageList[i + 6] / 100) + 1), ((damageList[i + 6] / 100) + 1));
+            damage *= rand(1 / ((damageList[i + 6] / 200) + 1), ((damageList[i + 6] / 200) + 1)); // 7% variance = 3.5% down or 3.5% up
 
             if (people[damageList[i + 1]].sEffects.includes(19) && damageList[i + 7].includes("Magical") && !damageList[i + 9]) { 
-                damage = damage * 2.5 * allInstEffect(damageList[i + 1], 19, 4, 1); 
+                damage = damage * (damageList[i + 7].includes("Physical") ? 2 : 2.5) * allInstEffect(damageList[i + 1], 19, 4, 1); 
                 console.log("Unstable Magic buff!") 
             };
 
             if (people[damageList[i + 1]].sEffects.includes(21) && damageList[i + 7].includes("Magical") && !damageList[i + 9]) { 
-                damage = damage * (0.1 / allInstEffect(damageList[i + 1], 21, 4)); 
+                damage = damage * ((damageList[i + 7].includes("Physical") ? 0.4 : 0.1) / allInstEffect(damageList[i + 1], 21, 4)); 
                 console.log("Silenced nerf!") 
             };
 
             let DMsub = 0;
-            if (damageList[i + 8] < 1 || damageList[i + 9]) { DMsub += people[victim].trueDef; };
+            if (damageList[i + 8] < 1 && !damageList[i + 9]) { 
+                DMsub += people[victim].truePDEF * damageList[i + 7].includes("Physical"); 
+                DMsub += people[victim].trueMDEF * damageList[i + 7].includes("Magical"); 
+                if (damageList[i + 7].includes("Magical") && damageList[i + 7].includes("Physical")) {
+                    DMsub /= 2;
+                }
+            };
             let DMdiv = 1;
-            if (damageList[i + 8] < 2 || damageList[i + 9]) { DMdiv *= people[victim].trueDDef; };
+            if (damageList[i + 8] < 2 && !damageList[i + 9]) { DMdiv *= people[victim].trueDDef; };
             let DMpow = 1;
-            if (damageList[i + 8] < 3 || damageList[i + 9]) { DMpow *= people[victim].truePDef; };
-            let trueDamage = Math.max((((damage ** DMpow) / DMdiv) - DMsub), 0);
+            if (damageList[i + 8] < 3 && !damageList[i + 9]) { DMpow *= people[victim].truePDef; };
+
+            let trueDamage = 0.0125 * Math.max((((2 * (damage ** 2)) / ((damage / 2) + DMsub)) ** DMpow) / DMdiv, 0);
 
             try {
                 peopleObj[victim].special(["damage", trueDamage, damageList[i + 7], people[damageList[i + 1]]], dI, people[damageList[i + 1]]) 
@@ -486,7 +493,6 @@ function newMusic(m) {
         MUSIC[i].load();
     }
     MUSIC[m].play();
-    MUSIC[3].play();
 }
 
 function updateVisuals() {
@@ -590,15 +596,16 @@ function changeAtt(spriteID, left, top, width, height, bgColor, src) {
 }
 
 function updateLastHP(delta) {
-    let hp
-    let mhp
+    let hp;
+    let mhp;
     for (let i = 0; i < peopleNames.length; ++i) {
-        hp = people[peopleNames[i]].health
-        mhp = people[peopleNames[i]].maxHealth
+        hp = people[peopleNames[i]].health;
+        mhp = people[peopleNames[i]].maxHealth;
         people[peopleNames[i]].hitTimer = people[peopleNames[i]].hitTimer + delta;
-        lastHP2[i] = lerp(1 - (0.00008 ** delta), lastHP2[i], hp)
+        lastHP2[i] = lerp(1 - (0.00008 ** delta), lastHP2[i], hp);
         if (people[peopleNames[i]].hitTimer >= 1) {
-            if ((lastHP[i] - hp) > (mhp * delta * 0.4 / people[peopleNames[i]].extraInfo[0].hpBars)) {
+            console.log()
+            if (Math.abs(lastHP[i] - hp) > (mhp * delta * 0.4 / people[peopleNames[i]].extraInfo[0].hpBars)) {
                 lastHP[i] += (mhp * delta * 0.4 * ((lastHP[i] > hp) ? -1 : 1)) / people[peopleNames[i]].extraInfo[0].hpBars;
             } else {
                 lastHP[i] = hp;
@@ -609,10 +616,10 @@ function updateLastHP(delta) {
 
 function colorChange(color, val, sat) { // #ABCDEF format only
     if (color[0] === "#") { color = color.slice(1); }
-    color = parseInt(color, 16)
-    let r = ((color >> 16) % 256) / 256
-    let g = ((color >> 8) % 256) / 256
-    let b = (color % 256) / 256
+    color = parseInt(color, 16);
+    let r = ((color >> 16) % 256) / 256;
+    let g = ((color >> 8) % 256) / 256;
+    let b = (color % 256) / 256;
     r = 1 - ((1 - r) * sat);
     g = 1 - ((1 - g) * sat);
     b = 1 - ((1 - b) * sat);
@@ -628,14 +635,13 @@ function mixColor(color, nextColor, type, time) {
     if (color[0] === "#") { color = color.slice(1); }
     color = parseInt(color, 16)
     if (nextColor[0] === "#") { nextColor = nextColor.slice(1); }
-    nextColor = parseInt(nextColor, 16)
-    let r = ((color >> 16) % 256) / 256
-    let g = ((color >> 8) % 256) / 256
-    let b = (color % 256) / 256
-    let lr = ((nextColor >> 16) % 256) / 256
-    let lg = ((nextColor >> 8) % 256) / 256
-    let lb = (nextColor % 256) / 256
-    console.table([r, g, b, lr, lg, lb])
+    nextColor = parseInt(nextColor, 16);
+    let r = ((color >> 16) % 256) / 256;
+    let g = ((color >> 8) % 256) / 256;
+    let b = (color % 256) / 256;
+    let lr = ((nextColor >> 16) % 256) / 256;
+    let lg = ((nextColor >> 8) % 256) / 256;
+    let lb = (nextColor % 256) / 256;
     r = lerp(time, r, lr, type) * 256;
     g = lerp(time, g, lg, type) * 256;
     b = lerp(time, b, lb, type) * 256;
@@ -702,6 +708,9 @@ window.addEventListener('load', function () {
     document.getElementById("START").innerText = "Start!";
 
     for (let i = 0; i < peopleNames.length; i++) {
+
+        Object.assign(peopleObj[peopleNames[i]], {defaultAct: objectBasics(people[peopleNames[i]])})
+
         try {
             peopleObj[peopleNames[i]].init();
             peopleObj[peopleNames[i]].defaultAct.introduction();
@@ -714,6 +723,8 @@ window.addEventListener('load', function () {
         } catch {
             console.log(`${peopleNames[i]} doesn't have anything (setting) to initalize!`);
         }
+
+        
     }
 
     window.requestAnimationFrame(gameLoop);
@@ -732,18 +743,84 @@ window.addEventListener('load', function () {
         }
         if (Time > lastTurn) {
             let alive = checkForAlive();
-            if (alive[2].length === 0) { currentState.ended = Infinity; } // a tie, but everyone is knocked out smh
+            if (alive[2].length === 0) { 
+                currentState.ended = Infinity; 
+                console.log("game over?")
+                for (let i = 0; i < peopleNames.length(); i++) {
+                    people[peopleNames[i]].health = people[peopleNames[i]].maxHealth
+                    people[peopleNames[i]].sDuration = []
+                    people[peopleNames[i]].sEffects = []
+                    people[peopleNames[i]].sStrength = []
+                    people[peopleNames[i]].alive = true
+                }
+            } // a tie, but everyone is knocked out smh
             if (alive[2].length === 1) { 
                 currentState.ended = alive[2][0]; 
-                let x = intRand(0, 0)
-                switch (x){
-                    case 0:
-                        let eneType = "Fire"
-                        Object.assign(people, {"slime": new Character("slime", 1, [true, `slime (${eneType})`],     -150,  150,  4 / 3, -5, 90,  3 / 4, [15,   4],  0,  45,     5,     [eneType],           8,      4,     18,   "Normal", "Enemy",    0,    128,   256)})
-                        break;
-                    default:
-                        console.error("no")
+                let x = intRand(0, 5)
+                let shit = {
+                    0: {
+                        type: "Fire",
+                        hp: 30,
+                        mp: 10,
+                        patk: 12,
+                        pdef: 8,
+                        matk: 10,
+                        mdef: 6,
+                        spd: 15
+                    },
+                    1: {
+                        type: "Water",
+                        hp: 25,
+                        mp: 15,
+                        patk: 10,
+                        pdef: 12,
+                        matk: 12,
+                        mdef: 10,
+                        spd: 20
+                    },
+                    2: {
+                        type: "Grass",
+                        hp: 20,
+                        mp: 20,
+                        patk: 10,
+                        pdef: 12,
+                        matk: 18,
+                        mdef: 12,
+                        spd: 17
+                    },
+                    3: {
+                        type: "Electric",
+                        hp: 18,
+                        mp: 10,
+                        patk: 16,
+                        pdef: 2,
+                        matk: 17,
+                        mdef: 9,
+                        spd: 15
+                    },
+                    4: {
+                        type: "Fighting",
+                        hp: 22,
+                        mp: 4,
+                        patk: 24,
+                        pdef: 16,
+                        matk: 6,
+                        mdef: 4,
+                        spd: 16
+                    },
+                    5: {
+                        type: "Normal",
+                        hp: 25,
+                        mp: 8,
+                        patk: 12,
+                        pdef: 13,
+                        matk: 12,
+                        mdef: 11,
+                        spd: 17
+                    },
                 }
+                let enemy = shit[x]
+                Object.assign(people, {"slime": new Character("slime", intRand(1, 3),  [true, `slime (${enemy.type})`], -150,  150,  4 / 3, 0, 50,  3 / 4, [15,   4],  [0],  enemy.hp, enemy.mp, [enemy.type], enemy.patk, enemy.matk, enemy.pdef, enemy.mdef, enemy.spd, "Normal", "Enemy", 1, 128, 128)})
                 
             } // winning team
             if (currentState.ended === 0) {
@@ -774,7 +851,7 @@ window.addEventListener('load', function () {
 });
 
 function comboSFX(amt, pow) {
-    let x = ((amt - 1) * 2) + pow
+    let x = ((amt - 1) * 2) + pow;
     comboSound[x].play()
 }
 
@@ -791,7 +868,7 @@ function checkForAlive() {
         if (people[peopleNames[i]].alive) {
             temp.push(people[peopleNames[i]]);
             if (!teamsAlive.includes(people[peopleNames[i]].team)) {
-                teamsAlive.push(people[peopleNames[i]].team)
+                teamsAlive.push(people[peopleNames[i]].team);
             }
             length++;
         }
@@ -801,7 +878,7 @@ function checkForAlive() {
 
 function getTurnOrder(list, len) {
     for (let i = 0; i < peopleNames.length; ++i) {
-        people[peopleNames[i]].updateSTATEffects()
+        people[peopleNames[i]].updateSTATEffects();
     }
     turnOrder = [];
     for (let i = 0; i < len; ++i) {

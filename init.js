@@ -101,16 +101,24 @@ let timeForTurn = 5.00;
 let lastTurn = 0;
 let turnID = 0;
 let logLevel = 0;
+let loadedPeopleObj = false;
 let currentState = {
     ended: 0
 }
 
+let characters = [];
+let hpBarZ = [];
+let hpBarA = [];
+let hpBarB = [];
+let hpBarC = [];
+let hpBarD = [];
+let mpBarZ = [];
+let mpBarA = [];
+let mpBarB = [];
+
+
 for (let i = 0; i < MUSIC.length; ++i) {
     MUSIC[i].loop = true;
-}
-
-function doLevels(type, level, base){
-
 }
 
 function allInstEffect(person, id, type, second = 0) { // gets all Instances of effects
@@ -146,7 +154,7 @@ function allInstEffect(person, id, type, second = 0) { // gets all Instances of 
 }
 
 class Character {
-    constructor(name, lvl, temp, XPos, YPos, size, XOffsetHP, YOffsetHP, SizeOffsetHP, [baseXPReq, xpType], xp, baseHP, baseMP, elem, baseATK, baseDEF, baseSPD, hpType, personType, team, sizeX, sizeY) {
+    constructor(name, lvl, temp, XPos, YPos, size, XOffsetHP, YOffsetHP, SizeOffsetHP, [baseXPReq, xpType], xp, baseHP, baseMP, elem, basePATK, basePDEF, baseMATK, baseMDEF, baseSPD, hpType, personType, team, sizeX, sizeY) {
         this.temporary = temp[0]
         if (temp[0] === true) {
             this.jsonType = temp[1]
@@ -156,7 +164,7 @@ class Character {
         this.name = name;
         let lf = lvl - 1;
         //lf = (((lf + ((lf ** 2) / 15) + ((lf ** 3) / 120)) ** (1 + (lf / 240))) + 8) / 8;
-        lf = ((lf + ((lf ** 2) / 96)) + 8) / 8 * (1 + 0.05 * (Math.floor(lf / 4))) * (1 + 0.075 * (Math.floor(lf / 10))) * (1 + 0.125 * (Math.floor(lf / 50)));
+        lf = ((lf + ((lf ** 2) / 200)) + 16) / 16 * (1 + 0.0321 * (Math.floor(lf / 4))) * (1 + 0.04 * (Math.floor(lf / 10))) * (1 + 0.075 * (Math.floor(lf / 50)));
         this.level = lvl;
         this.animations = [];
         this.baseXPos = XPos;
@@ -167,36 +175,60 @@ class Character {
         this.xPosHP = XOffsetHP;
         this.yPosHP = YOffsetHP;
         this.sHP = SizeOffsetHP;
-        this.expPoints = xp;
-        this.nextLv = baseXPReq / 10;
+        this.xp = xp;
+        this.xpLevel = baseXPReq / 10;
         switch (xpType) {
             case 0:
-                this.nextLv *= 0.79 * (lvl ** 3) + 0.92 * (lvl ** 2) + 8 * lvl
+                this.xpLevel *= 0.79 * (lvl ** 3) + 0.92 * (lvl ** 2) + 8 * lvl
                 break;
             case 1:
-                this.nextLv *= 0.99 * (lvl ** 3) + 0.9 * (lvl ** 2) + 10.02 * lvl - 1.91
+                this.xpLevel *= 0.99 * (lvl ** 3) + 0.9 * (lvl ** 2) + 10.02 * lvl - 1.91
                 break;
             case 2:
-                this.nextLv *= 1.23 * (lvl ** 3) + 1.9 * (lvl ** 2) + 10.03 * lvl - 3.16
+                this.xpLevel *= 1.23 * (lvl ** 3) + 1.9 * (lvl ** 2) + 10.03 * lvl - 3.16
                 break;
             case 3:
-                this.nextLv *= 1.48 * (lvl ** 3) + 1.88 * (lvl ** 2) + 12.03 * lvl - 3.39
+                this.xpLevel *= 1.48 * (lvl ** 3) + 1.88 * (lvl ** 2) + 12.03 * lvl - 3.39
                 break;
             case 4:
-                this.nextLv *= 1.98 * (lvl ** 3) + 1.85 * (lvl ** 2) + 15.04 * lvl - 3.87
+                this.xpLevel *= 1.98 * (lvl ** 3) + 1.85 * (lvl ** 2) + 15.04 * lvl - 3.87
                 break;
             default:
                 throw new Error(`invalid xp type: ${xpType}`)
+        }
+        this.base = {
+            hp: baseHP,
+            mp: baseMP,
+            patk: basePATK,
+            matk: baseMATK,
+            pdef: basePDEF,
+            mdef: baseMDEF,
+            spd: baseSPD,
+            xp: baseXPReq,
+            xpt: xpType
+        }
+        this.EVs = {
+            hp: 0,
+            mp: 0,
+            patk: 0,
+            matk: 0,
+            pdef: 0,
+            mdef: 0,
+            spd: 0
         }
         this.maxHealth = baseHP * lf;
         this.health = this.maxHealth;
         this.maxMana = baseMP * lf;
         this.mana = this.maxMana;
-        this.atk = baseATK * lf;
-        this.def = baseDEF * lf;
-        this.spd = baseSPD * (lf ** 0.1);
-        this.trueAtk = this.atk;
-        this.trueDef = this.def;
+        this.PATK = basePATK * lf;
+        this.PDEF = basePDEF * lf;
+        this.MATK = baseMATK * lf;
+        this.MDEF = baseMDEF * lf;
+        this.spd = baseSPD * lf;
+        this.truePATK = this.PATK;
+        this.truePDEF = this.PDEF;
+        this.trueMATK = this.MATK;
+        this.trueMDEF = this.MDEF;
         this.trueSpd = this.spd;
         this.HPtype = hpType;
         this.type = elem;
@@ -234,15 +266,85 @@ class Character {
         this.extraVar = {
             "hit": null
         };
+        this.fullInit()
+        let i = peopleNames.indexOf(this.name)
+        let htmlname = "character" + i;
+        const char = document.createElement("img");
+        const MAIN = document.getElementById("characters");
+        char.id = htmlname;
+        MAIN.appendChild(char);
+        document.getElementById(htmlname).classList.add("character" + i);
+        document.getElementById(htmlname).classList.add("character");
+        characters.push(document.getElementById(htmlname));
+    
+        const hpCon = document.createElement("div");
+        htmlname = "hp" + i + "-container";
+        hpCon.id = htmlname;
+        MAIN.appendChild(hpCon);
+        document.getElementById(htmlname).classList.add("bar-container");
+        document.getElementById(htmlname).classList.add("bar");
+        hpBarZ.push(document.getElementById(htmlname));
+    
+        const hpA = document.createElement("div");
+        htmlname = "hp" + i + "a";
+        hpA.id = htmlname;
+        hpCon.appendChild(hpA);
+        document.getElementById(htmlname).classList.add("fill");
+        hpBarA.push(document.getElementById(htmlname));
+    
+        const hpB = document.createElement("div");
+        htmlname = "hp" + i + "b";
+        hpB.id = htmlname;
+        hpCon.appendChild(hpB);
+        document.getElementById(htmlname).classList.add("last");
+        hpBarB.push(document.getElementById(htmlname));
+    
+        const hpD = document.createElement("div");
+        htmlname = "hp" + i + "d";
+        hpD.id = htmlname;
+        hpCon.appendChild(hpD);
+        document.getElementById(htmlname).classList.add("last");
+        hpBarD.push(document.getElementById(htmlname));
+    
+        const hpC = document.createElement("div");
+        htmlname = "hp" + i + "c";
+        hpC.id = htmlname;
+        hpCon.appendChild(hpC);
+        document.getElementById(htmlname).classList.add("empty");
+        hpBarC.push(document.getElementById(htmlname));
+    
+        const mpCon = document.createElement("div");
+        htmlname = "mp" + i + "-container";
+        mpCon.id = htmlname;
+        MAIN.appendChild(mpCon);
+        document.getElementById(htmlname).classList.add("bar-container");
+        document.getElementById(htmlname).classList.add("bar");
+        mpBarZ.push(document.getElementById(htmlname));
+    
+        const mpA = document.createElement("div");
+        htmlname = "mp" + i + "a";
+        mpA.id = htmlname;
+        mpCon.appendChild(mpA);
+        document.getElementById(htmlname).classList.add("fill");
+        mpBarA.push(document.getElementById(htmlname));
+    
+        const mpB = document.createElement("div");
+        htmlname = "mp" + i + "b";
+        mpB.id = htmlname;
+        mpCon.appendChild(mpB);
+        document.getElementById(htmlname).classList.add("empty");
+        mpBarB.push(document.getElementById(htmlname));
     }
 
     updateSTATEffects() {
-        this.trueAtk = this.atk;
-        this.trueDef = this.def;
+        this.truePATK = this.PATK;
+        this.truePDEF = this.PDEF;
+        this.trueMATK = this.MATK;
+        this.trueMDEF = this.MDEF;
+        this.trueSpd = this.spd;
         this.trueDDef = 1;
         this.truePDef = 1;
-        this.trueSpd = this.spd;
-        let attempts = 0
+        let attempts = 0;
         for (let i = 0; i < this.sEffects.length; ++i) {
             if (attempts > 10000) {
                 throw new Error(`Hey! Something went wrong! I can't process this! (attempted status effects ${attempts} times)`);
@@ -252,12 +354,12 @@ class Character {
             switch (this.sEffects[i]) {
                 case 1:
                     this.trueSpd *= allInstEffect(this.name, 1, 5, 1);
-                    this.trueDef *= 0.8
+                    this.truePDEF *= 0.8
                     this.trueDDef *= 0.8
                     break;
                 case 2:
                     this.trueSpd *= 0.8
-                    this.trueDef *= 0.8
+                    this.truePDEF *= 0.8
                     break;
                 case 3:
                     this.trueSpd *= 0.5
@@ -277,7 +379,7 @@ class Character {
                     break;
                 case 5:
                     this.trueSpd = 0
-                    this.trueDDef *= 1.5
+                    this.trueDDef *= 2
                     break;
                 case 6:
                     this.trueSpd *= 0.8
@@ -287,14 +389,14 @@ class Character {
                     break;
                 case 8:
                     this.trueSpd *= 0.75
-                    this.trueDef *= 0.75
+                    this.truePDEF *= 0.75
                     break;
                 case 9:
-                    this.trueDef *= 0.75
+                    this.truePDEF *= 0.75
                     this.trueDDef *= 0.75
                     break;
                 case 10:
-                    this.trueDef *= 1.5
+                    this.trueMDEF *= 1.5
                     this.trueDDef *= 1.5
                     break;
                 case 11:
@@ -305,10 +407,14 @@ class Character {
                     break;
                 case 15:
                     this.trueSpd *= 1.333
+                    this.trueMATK *= 1.75
+                    this.truePATK *= 1.5
                     break;
                 case 16:
-                    this.trueAtk *= 1.5
+                    this.truePATK *= 1.5
+                    this.trueMATK *= 1.333
                     this.trueSpd *= 1.333
+                    this.trueDDef *= 0.667
                     break;
                 case 17:
                     this.trueSpd *= 0.667
@@ -320,10 +426,12 @@ class Character {
                     this.trueSpd *= 0.75
                     break;
                 case 22:
-                    this.trueAtk *= 1.5
+                    this.truePATK *= 1.5
+                    this.trueMATK *= 1.333
                     break;
                 case 23:
-                    this.trueAtk *= 0.667
+                    this.truePATK *= 0.667
+                    this.trueMATK *= 0.8
                     break;
                 default:
                     // only special effects played here. Move on!
@@ -451,19 +559,103 @@ class Character {
         damageList.push("Effect", this.name, person, id, duration, strength, overwrite);
     }
 
-    fullInit(){
-        try {
-            peopleObj[this.name].init();
-            peopleObj[this.name].defaultAct.introduction();
-        } catch(e) {
-            console.log(`${this.name} doesn't have anything (general) to initalize!`);
-        }
+    fullInit() {
+        let idea = this.name
+        console.log(idea)
+        let timeasgaf
+        timeasgaf = setInterval(gfg_function, 1000);
+        function gfg_function() {
 
-        try {
-            peopleObj[this.name].defaultAct.initEI0();
-        } catch {
-            console.log(`${this.name} doesn't have anything (setting) to initalize!`);
+            Object.assign(peopleObj[idea], {defaultAct: objectBasics(people[idea])})
+
+            try {
+                peopleObj[idea].init();
+                peopleObj[idea].defaultAct.introduction();
+                clearInterval(timeasgaf)
+            } catch(e) {
+                console.log(e)
+                console.log(`${idea} doesn't have anything (general) to initalize!`);
+            }
+    
+            try {
+                console.log(idea)
+                peopleObj[idea].defaultAct.initEI0();
+                clearInterval(timeasgaf)
+            } catch(e) {
+                console.log(e)
+                console.log(`${idea} doesn't have anything (setting) to initalize!`);
+            }
         }
+        
+    }
+
+    levelUp() {
+        if (this.xp < this.xpLevel) {
+            return;
+        }
+        for (let att = 0; this.xp >= this.xpLevel; att++) {
+            if (att >= 100000) { throw new Error("levelling up took too long") }
+            this.level++
+            console.log(`${this.name} leveled up to [ ${this.level} ] !`)
+            this.xpLevel = this.base.xp / 10;
+            let lvl = this.level
+            switch (this.base.xpt) {
+                case 0:
+                    this.xpLevel *= 0.79 * (lvl ** 3) + 0.92 * (lvl ** 2) + 8 * lvl
+                    break;
+                case 1:
+                    this.xpLevel *= 0.99 * (lvl ** 3) + 0.9 * (lvl ** 2) + 10.02 * lvl - 1.91
+                    break;
+                case 2:
+                    this.xpLevel *= 1.23 * (lvl ** 3) + 1.9 * (lvl ** 2) + 10.03 * lvl - 3.16
+                    break;
+                case 3:
+                    this.xpLevel *= 1.48 * (lvl ** 3) + 1.88 * (lvl ** 2) + 12.03 * lvl - 3.39
+                    break;
+                case 4:
+                    this.xpLevel *= 1.98 * (lvl ** 3) + 1.85 * (lvl ** 2) + 15.04 * lvl - 3.87
+                    break;
+                default:
+                    throw new Error(`invalid xp type: ${this.base.xpt}`)
+            }
+            
+            let m = this.getLvlChange(this.level, this.base.hp, this.maxHealth, "Maximum HP")
+            this.maxHealth += m
+            this.health += m
+            m = this.getLvlChange(this.level, this.base.mp, this.maxMana, "Maximum MP")
+            this.maxMana += m
+            this.mana += m
+            this.PATK += this.getLvlChange(this.level, this.base.patk, this.PATK, "Strength")
+            this.MATK += this.getLvlChange(this.level, this.base.matk, this.MATK, "Wisdom")
+            this.PDEF += this.getLvlChange(this.level, this.base.pdef, this.PDEF, "Endurance")
+            this.MDEF += this.getLvlChange(this.level, this.base.mdef, this.MDEF, "Resistance")
+            this.spd += this.getLvlChange(this.level, this.base.spd, this.spd, "Speed")
+            // EWW formatting
+            console.log(`HP:     ${this.maxHealth}
+MP:     ${this.maxMana}
+PATK:   ${this.PATK}
+MATK:   ${this.MATK}
+PDEF:   ${this.PDEF}
+MDEF:   ${this.MDEF}
+SPD:    ${this.spd}`)
+        }
+    }
+
+    getLvlChange(lv, stat, cStat, statName) {
+        let lf = lv - 1
+        lf = (((lf * 21 / 22) + ((lf ** 2) / 198)) + 16) / 16 * (1 + 0.02 * (Math.floor(lv / 4))) * (1 + (Math.floor(lv / 10)) / 15) * (1 + 0.1 * (Math.floor(lv / 50)));
+        let change
+        change = (stat * lf * calcEVs(this[stat])) - cStat
+        if (lv % 25 !== 0) {
+            change *= (Math.random() * 0.75) + 0.25
+        }
+        change = Math.round(Math.max(0, change))
+        if (change > 0) { console.log(`${statName} increased by ${change} !`) }
+        return change
+    }
+
+    calcEVs(ev) {
+        return 1 + Math.sqrt(ev) / 2048;
     }
 }
 
@@ -472,23 +664,13 @@ for (let i = 0; i < MUSIC.length; ++i) {
 }
 
 let people = {
-    //                                                     Lv  Temporary?   XPos  YPos  Size   HPX HPY  HPS    XPR   XPT   XPS BaseHP  BaseMP Type(s)                 BATK    BDEF   BSpd  HPType    PersonType   Team  Xscale Yscale
-    "FSBlue":             new Character("FSBlue",          1,  [false],     150,  150,  4 / 3, -5, 90,  3 / 4, [15,   4],  0,  20,     5,     ["Normal"],             5,      2,     12,   "Normal", "Enemy",     1,    128,   256),
-    // "Alterian Skyler":    new Character("Alterian Skyler", 1,  [false],     150,  150,  1,     -5, 120, 1,     [10,   2],  0,  20,     15,    ["Electric"],           4,      0,     22,   "Normal", "Player",     0,    128,   256),
-    // "ToWM TowerSB":       new Character("ToWM TowerSB",    1,  [false],    -200, -100,  1,     -5, 110, 1,     [12,   1],  0,  20,     10,    ["Normal"],             6,      1,     16,   "Normal", "Player",     0,    128,   256),
-    // "ToFUN TowerSB":      new Character("ToFUN TowerSB",   1,  [false],    -125, -125,  1,     -5, 120, 1,     [ 8,   0],  0,  25,     10,    ["Normal"],             4,      2,     16,   "Normal", "Player",     0,    128,   256),
-    // "Delet Ball":         new Character("Delet Ball",      1,  [false],     200, -100,  1,     -5, 60,  1,     [120,  3],  0,  480,    160,   ["Dark"],               16,     0,     20,   "Normal", "Boss",       1,    128,   128),
+    //                                                        Lv  Temporary?   XPos  YPos  Size   HPX HPY  HPS    XPR   XPT   XPS   BaseHP  BaseMP Type(s)                 PATK    PDEF   MATK    MDEF  BSpd  HPType    PersonType    Team  Xscale Yscale
+       "FSBlue":             new Character("FSBlue",          1,  [false],     150,  150,  4 / 3, -5, 90,  3 / 4, [15,   4],  [0],  45,     3,     ["Fighting"],           35,     33,    9,      13,   20,   "Normal", "Player",     0,    128,   256),
+    // "Alterian Skyler":    new Character("Alterian Skyler", 1,  [false],     150,  150,  1,     -5, 120, 1,     [10,   2],  [0],  100,    15,    ["Electric"],           15,     0,     27,     26,   22,   "Normal", "Player",     0,    128,   256),
+    // "ToWM TowerSB":       new Character("ToWM TowerSB",    1,  [false],    -200, -100,  1,     -5, 110, 1,     [12,   1],  [0],  20,     12,    ["Normal"],             25,     15,    24,     16,   16,   "Normal", "Player",     0,    128,   256),
+    // "ToFUN TowerSB":      new Character("ToFUN TowerSB",   1,  [false],    -125, -125,  1,     -5, 120, 1,     [ 8,   0],  [0],  35,     10,    ["Normal"],             28,     30,    19,     15,   16,   "Normal", "Player",     0,    128,   256),
+    // "Delet Ball":         new Character("Delet Ball",      1,  [false],     200, -100,  1,     -5, 60,  1,     [120,  3],  [0],  960,    160,   ["Dark"],               30,     12,    30,     12,   20,   "Normal", "Boss",       1,    128,   128),
 }
-
-let characters = [];
-let hpBarZ = [];
-let hpBarA = [];
-let hpBarB = [];
-let hpBarC = [];
-let hpBarD = [];
-let mpBarZ = [];
-let mpBarA = [];
-let mpBarB = [];
 
 const draw = document.querySelector("#effects");
 const pen = draw.getContext("2d");
@@ -533,73 +715,73 @@ const drawing = () => {
     }
 }
 
-for (let i = 0; i < peopleNames.length; i++) {
-    let name = "character" + i;
-    const char = document.createElement("img");
-    const MAIN = document.getElementById("characters");
-    char.id = name;
-    MAIN.appendChild(char);
-    document.getElementById(name).classList.add("character" + i);
-    document.getElementById(name).classList.add("character");
-    characters.push(document.getElementById(name));
+// for (let i = 0; i < peopleNames.length; i++) {
+//     let name = "character" + i;
+//     const char = document.createElement("img");
+//     const MAIN = document.getElementById("characters");
+//     char.id = name;
+//     MAIN.appendChild(char);
+//     document.getElementById(name).classList.add("character" + i);
+//     document.getElementById(name).classList.add("character");
+//     characters.push(document.getElementById(name));
 
-    const hpCon = document.createElement("div");
-    name = "hp" + i + "-container";
-    hpCon.id = name;
-    MAIN.appendChild(hpCon);
-    document.getElementById(name).classList.add("bar-container");
-    document.getElementById(name).classList.add("bar");
-    hpBarZ.push(document.getElementById(name));
+//     const hpCon = document.createElement("div");
+//     name = "hp" + i + "-container";
+//     hpCon.id = name;
+//     MAIN.appendChild(hpCon);
+//     document.getElementById(name).classList.add("bar-container");
+//     document.getElementById(name).classList.add("bar");
+//     hpBarZ.push(document.getElementById(name));
 
-    const hpA = document.createElement("div");
-    name = "hp" + i + "a";
-    hpA.id = name;
-    hpCon.appendChild(hpA);
-    document.getElementById(name).classList.add("fill");
-    hpBarA.push(document.getElementById(name));
+//     const hpA = document.createElement("div");
+//     name = "hp" + i + "a";
+//     hpA.id = name;
+//     hpCon.appendChild(hpA);
+//     document.getElementById(name).classList.add("fill");
+//     hpBarA.push(document.getElementById(name));
 
-    const hpB = document.createElement("div");
-    name = "hp" + i + "b";
-    hpB.id = name;
-    hpCon.appendChild(hpB);
-    document.getElementById(name).classList.add("last");
-    hpBarB.push(document.getElementById(name));
+//     const hpB = document.createElement("div");
+//     name = "hp" + i + "b";
+//     hpB.id = name;
+//     hpCon.appendChild(hpB);
+//     document.getElementById(name).classList.add("last");
+//     hpBarB.push(document.getElementById(name));
 
-    const hpD = document.createElement("div");
-    name = "hp" + i + "d";
-    hpD.id = name;
-    hpCon.appendChild(hpD);
-    document.getElementById(name).classList.add("last");
-    hpBarD.push(document.getElementById(name));
+//     const hpD = document.createElement("div");
+//     name = "hp" + i + "d";
+//     hpD.id = name;
+//     hpCon.appendChild(hpD);
+//     document.getElementById(name).classList.add("last");
+//     hpBarD.push(document.getElementById(name));
 
-    const hpC = document.createElement("div");
-    name = "hp" + i + "c";
-    hpC.id = name;
-    hpCon.appendChild(hpC);
-    document.getElementById(name).classList.add("empty");
-    hpBarC.push(document.getElementById(name));
+//     const hpC = document.createElement("div");
+//     name = "hp" + i + "c";
+//     hpC.id = name;
+//     hpCon.appendChild(hpC);
+//     document.getElementById(name).classList.add("empty");
+//     hpBarC.push(document.getElementById(name));
 
-    const mpCon = document.createElement("div");
-    name = "mp" + i + "-container";
-    mpCon.id = name;
-    MAIN.appendChild(mpCon);
-    document.getElementById(name).classList.add("bar-container");
-    document.getElementById(name).classList.add("bar");
-    mpBarZ.push(document.getElementById(name));
+//     const mpCon = document.createElement("div");
+//     name = "mp" + i + "-container";
+//     mpCon.id = name;
+//     MAIN.appendChild(mpCon);
+//     document.getElementById(name).classList.add("bar-container");
+//     document.getElementById(name).classList.add("bar");
+//     mpBarZ.push(document.getElementById(name));
 
-    const mpA = document.createElement("div");
-    name = "mp" + i + "a";
-    mpA.id = name;
-    mpCon.appendChild(mpA);
-    document.getElementById(name).classList.add("fill");
-    mpBarA.push(document.getElementById(name));
+//     const mpA = document.createElement("div");
+//     name = "mp" + i + "a";
+//     mpA.id = name;
+//     mpCon.appendChild(mpA);
+//     document.getElementById(name).classList.add("fill");
+//     mpBarA.push(document.getElementById(name));
 
-    const mpB = document.createElement("div");
-    name = "mp" + i + "b";
-    mpB.id = name;
-    mpCon.appendChild(mpB);
-    document.getElementById(name).classList.add("empty");
-    mpBarB.push(document.getElementById(name));
-}
+//     const mpB = document.createElement("div");
+//     name = "mp" + i + "b";
+//     mpB.id = name;
+//     mpCon.appendChild(mpB);
+//     document.getElementById(name).classList.add("empty");
+//     mpBarB.push(document.getElementById(name));
+// }
 
 resize();
