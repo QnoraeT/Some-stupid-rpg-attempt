@@ -20,25 +20,43 @@
     "slime (Fire)": {
         "hpBars": 3,
         "blood": false,
-        "hpBarColor": ["default", "#c00000", "#e00000", "#ff0000"],
+        "hpBarColor": ["default", "#800000", "#c00000", "#ff0000"],
+        "description": "a slime, of course lmfao"
+    },
+    "slime (Fighting)": {
+        "hpBars": 3,
+        "blood": false,
+        "hpBarColor": ["default", "#803000", "#c06000", "#ffa000"],
+        "description": "a slime, of course lmfao"
+    },
+    "slime (Poison)": {
+        "hpBars": 3,
+        "blood": false,
+        "hpBarColor": ["default", "#400080", "#6000c0", "#8000ff"],
         "description": "a slime, of course lmfao"
     },
     "slime (Grass)": {
         "hpBars": 3,
         "blood": false,
-        "hpBarColor": ["default", "#00c000", "#00e000", "#00ff00"],
+        "hpBarColor": ["default", "#008000", "#00c000", "#00ff00"],
         "description": "a slime, of course lmfao"
     },
     "slime (Water)": {
         "hpBars": 3,
         "blood": false,
-        "hpBarColor": ["default", "#0000c0", "#0000e0", "#0000ff"],
+        "hpBarColor": ["default", "#000080", "#0000c0", "#0000ff"],
         "description": "a slime, of course lmfao"
     },
     "slime (Electric)": {
         "hpBars": 3,
         "blood": false,
-        "hpBarColor": ["default", "#c0c000", "#e0e000", "#ffff00"],
+        "hpBarColor": ["default", "#808000", "#c0c000", "#ffff00"],
+        "description": "a slime, of course lmfao"
+    },
+    "slime (Normal)": {
+        "hpBars": 3,
+        "blood": false,
+        "hpBarColor": ["default", "#808060", "#c0c0a0", "#ffffc0"],
         "description": "a slime, of course lmfao"
     },
     "BIG SLIME": {

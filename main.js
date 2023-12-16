@@ -756,7 +756,7 @@ window.addEventListener('load', function () {
             } // a tie, but everyone is knocked out smh
             if (alive[2].length === 1) { 
                 currentState.ended = alive[2][0]; 
-                let x = intRand(0, 5)
+                let leftOver = [0, 1, 2, 3, 4, 5]
                 let shit = {
                     0: {
                         type: "Fire",
@@ -819,9 +819,17 @@ window.addEventListener('load', function () {
                         spd: 17
                     },
                 }
-                let enemy = shit[x]
-                Object.assign(people, {"slime": new Character("slime", intRand(1, 3),  [true, `slime (${enemy.type})`], -150,  150,  4 / 3, 0, 50,  3 / 4, [15,   4],  [0],  enemy.hp, enemy.mp, [enemy.type], enemy.patk, enemy.matk, enemy.pdef, enemy.mdef, enemy.spd, "Normal", "Enemy", 1, 128, 128)})
-                
+                let x
+                let enemyNum = 0
+                for (let i = 0; i < 5; i++) {
+                    if (Math.random() < 0.5) {
+                        enemyNum++
+                        x = leftOver[intRand(0, leftOver.length)]
+                        let enemy = shit[x]
+                        Object.assign(people, {"slime": new Character("slime", intRand(1, 3),  [true, `slime (${enemy.type})`], -150,  80 * Math.floor((enemyNum + 1) / 2) * ((enemyNum % 2) - 0.5) * 2,  4 / 3, 0, 50,  3 / 4, [15,   4],  [0],  enemy.hp, enemy.mp, [enemy.type], enemy.patk, enemy.matk, enemy.pdef, enemy.mdef, enemy.spd, "Normal", "Enemy", 1, 128, 128)})
+                    }
+                    leftOver.splice(x, 1)
+                }
             } // winning team
             if (currentState.ended === 0) {
                 if (people[peopleNames[turnID]].alive === true) {

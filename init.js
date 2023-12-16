@@ -86,6 +86,7 @@ sfx3.wav = hit slowdown
 sfx4.wav = charging
 
 */
+let GLOBAL_ID = 0
 let musicState = 1;
 let musicUpdate = 0;
 let peopleNames = [];
@@ -121,6 +122,10 @@ for (let i = 0; i < MUSIC.length; ++i) {
     MUSIC[i].loop = true;
 }
 
+function makeCharacter(params) {
+    GLOBAL_ID++
+}
+
 function allInstEffect(person, id, type, second = 0) { // gets all Instances of effects
     let k = (type === 5 || type === 4) ? 1 : 0
     for (let i = 0; i < people[person].sEffects.length; ++i) {
@@ -153,6 +158,29 @@ function allInstEffect(person, id, type, second = 0) { // gets all Instances of 
     return k
 }
 
+function xp(base, lvl, type) {
+    let xpLevel = base / 10;
+    switch (type) {
+        case 0:
+            xpLevel *= 0.79 * (lvl ** 3) + 0.92 * (lvl ** 2) + 8 * lvl
+            break;
+        case 1:
+            xpLevel *= 0.99 * (lvl ** 3) + 0.9 * (lvl ** 2) + 10.02 * lvl - 1.91
+            break;
+        case 2:
+            xpLevel *= 1.23 * (lvl ** 3) + 1.9 * (lvl ** 2) + 10.03 * lvl - 3.16
+            break;
+        case 3:
+            xpLevel *= 1.48 * (lvl ** 3) + 1.88 * (lvl ** 2) + 12.03 * lvl - 3.39
+            break;
+        case 4:
+            xpLevel *= 1.98 * (lvl ** 3) + 1.85 * (lvl ** 2) + 15.04 * lvl - 3.87
+            break;
+        default:
+            throw new Error(`invalid xp type: ${type}`)
+    }
+    return xpLevel
+}
 class Character {
     constructor(name, lvl, temp, XPos, YPos, size, XOffsetHP, YOffsetHP, SizeOffsetHP, [baseXPReq, xpType], xp, baseHP, baseMP, elem, basePATK, basePDEF, baseMATK, baseMDEF, baseSPD, hpType, personType, team, sizeX, sizeY) {
         this.temporary = temp[0]
@@ -597,39 +625,18 @@ class Character {
             if (att >= 100000) { throw new Error("levelling up took too long") }
             this.level++
             console.log(`${this.name} leveled up to [ ${this.level} ] !`)
-            this.xpLevel = this.base.xp / 10;
-            let lvl = this.level
-            switch (this.base.xpt) {
-                case 0:
-                    this.xpLevel *= 0.79 * (lvl ** 3) + 0.92 * (lvl ** 2) + 8 * lvl
-                    break;
-                case 1:
-                    this.xpLevel *= 0.99 * (lvl ** 3) + 0.9 * (lvl ** 2) + 10.02 * lvl - 1.91
-                    break;
-                case 2:
-                    this.xpLevel *= 1.23 * (lvl ** 3) + 1.9 * (lvl ** 2) + 10.03 * lvl - 3.16
-                    break;
-                case 3:
-                    this.xpLevel *= 1.48 * (lvl ** 3) + 1.88 * (lvl ** 2) + 12.03 * lvl - 3.39
-                    break;
-                case 4:
-                    this.xpLevel *= 1.98 * (lvl ** 3) + 1.85 * (lvl ** 2) + 15.04 * lvl - 3.87
-                    break;
-                default:
-                    throw new Error(`invalid xp type: ${this.base.xpt}`)
-            }
-            
-            let m = this.getLvlChange(this.level, this.base.hp, this.maxHealth, "Maximum HP")
+            this.xpLevel = xp(this.base.xp, this.level, this.base.xpt);
+            let m = this.getLvlChange(this.level, this.base.hp, this.maxHealth, "Maximum HP", "hp")
             this.maxHealth += m
             this.health += m
-            m = this.getLvlChange(this.level, this.base.mp, this.maxMana, "Maximum MP")
+            m = this.getLvlChange(this.level, this.base.mp, this.maxMana, "Maximum MP", "mp")
             this.maxMana += m
             this.mana += m
-            this.PATK += this.getLvlChange(this.level, this.base.patk, this.PATK, "Strength")
-            this.MATK += this.getLvlChange(this.level, this.base.matk, this.MATK, "Wisdom")
-            this.PDEF += this.getLvlChange(this.level, this.base.pdef, this.PDEF, "Endurance")
-            this.MDEF += this.getLvlChange(this.level, this.base.mdef, this.MDEF, "Resistance")
-            this.spd += this.getLvlChange(this.level, this.base.spd, this.spd, "Speed")
+            this.PATK += this.getLvlChange(this.level, this.base.patk, this.PATK, "Strength", "patk")
+            this.MATK += this.getLvlChange(this.level, this.base.matk, this.MATK, "Wisdom", "pdef")
+            this.PDEF += this.getLvlChange(this.level, this.base.pdef, this.PDEF, "Endurance", "matk")
+            this.MDEF += this.getLvlChange(this.level, this.base.mdef, this.MDEF, "Resistance", "mdef")
+            this.spd += this.getLvlChange(this.level, this.base.spd, this.spd, "Speed", "spd")
             // EWW formatting
             console.log(`HP:     ${this.maxHealth}
 MP:     ${this.maxMana}
@@ -639,13 +646,14 @@ PDEF:   ${this.PDEF}
 MDEF:   ${this.MDEF}
 SPD:    ${this.spd}`)
         }
+        console.log(`XP: ${format(this.xp - xp(this.base.xp, this.level - 1, this.base.xpt), 0, 100000)} / ${format(this.xpLevel - xp(this.base.xp, this.level - 1, this.base.xpt), 0, 100000)}`)
     }
 
-    getLvlChange(lv, stat, cStat, statName) {
+    getLvlChange(lv, stat, cStat, statName, ev) {
         let lf = lv - 1
         lf = (((lf * 21 / 22) + ((lf ** 2) / 198)) + 16) / 16 * (1 + 0.02 * (Math.floor(lv / 4))) * (1 + (Math.floor(lv / 10)) / 15) * (1 + 0.1 * (Math.floor(lv / 50)));
         let change
-        change = (stat * lf * calcEVs(this[stat])) - cStat
+        change = (stat * lf * this.calcEVs(this.EVs[ev])) - cStat
         if (lv % 25 !== 0) {
             change *= (Math.random() * 0.75) + 0.25
         }
@@ -686,6 +694,7 @@ const drawing = () => {
         currentDI = damageIndicatorList[i];
         di = translateXY(currentDI[7], currentDI[8], currentDI[1], 0);
         fs = di[2]
+        console.log(currentDI[2])
         pen.fillStyle = currentDI[2];
 
         if (currentDI[5] <= currentDI[6] * 0.2) {

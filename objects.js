@@ -65,6 +65,7 @@ function objectBasics(person) {
                         return res.json();
                     })
                     .then((data) => people[person.name].extraInfo[0] = data[`${people[person.name].jsonType}`]);
+                    
 
                 // ! EXTRAINFO[0] CAN BE CHANGED!! REMEMBER THIS SO YOU DON'T PULL YOUR HAIR OUT ON HOW YOU CAN CHANGE STUFF IN THE JSON AFTER LOADING!
                 } catch {
